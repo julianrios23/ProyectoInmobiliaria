@@ -18,7 +18,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+// aqui defino el viewmodel gestiona los datos del perfil y la logica de edicion
 public class PerfilViewModel extends AndroidViewModel {
+    // aqui declaro los livedata para los campos del propietario y el estado de la vista
     private MutableLiveData<Propietario> propietario = new MutableLiveData<>();
     private final MutableLiveData<String> nombre = new MutableLiveData<>("");
     private final MutableLiveData<String> apellido = new MutableLiveData<>("");
@@ -28,13 +30,13 @@ public class PerfilViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> modoEdicion = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> mostrarToast = new MutableLiveData<>(false);
 
+    // inicializo el viewmodel
     public PerfilViewModel(@NonNull Application application) {
         super(application);
     }
 
-    public LiveData<Propietario> getPropietario() {
-        return propietario;
-    }
+    // aqui  los livedata para que el fragment observe
+    public LiveData<Propietario> getPropietario() { return propietario; }
     public LiveData<String> getNombre() { return nombre; }
     public LiveData<String> getApellido() { return apellido; }
     public LiveData<String> getDni() { return dni; }
@@ -43,16 +45,19 @@ public class PerfilViewModel extends AndroidViewModel {
     public LiveData<Boolean> getModoEdicion() { return modoEdicion; }
     public LiveData<Boolean> getMostrarToast() { return mostrarToast; }
 
+    // cambio el modo edicion econ booleano
     public void toggleModoEdicion() {
         Boolean actual = modoEdicion.getValue();
         if (actual == null) actual = false;
         modoEdicion.setValue(!actual);
     }
 
+    // inicio la carga de los datos del perfil desde la api
     public void cargarPerfil() {
         new PerfilTask().execute();
     }
 
+    // defino la tarea asincrona para obtener los datos del propietario desde la api
     private class PerfilTask extends AsyncTask<Void, Void, Propietario> {
         @Override
         protected Propietario doInBackground(Void... voids) {
@@ -90,6 +95,7 @@ public class PerfilViewModel extends AndroidViewModel {
             return null;
         }
 
+        // actualiz los livedata con los recibidos de la api
         @Override
         protected void onPostExecute(Propietario p) {
             if (p != null) {
@@ -103,6 +109,7 @@ public class PerfilViewModel extends AndroidViewModel {
         }
     }
 
+    // guardo los datos editados del perfil si el modo edicion esta activo
     public void guardarPerfil() {
         if (modoEdicion.getValue() != null && modoEdicion.getValue()) {
             new GuardarPerfilTask().execute(
@@ -115,6 +122,7 @@ public class PerfilViewModel extends AndroidViewModel {
         }
     }
 
+    // defino la tarea para enviar los datos editados a la api
     private class GuardarPerfilTask extends AsyncTask<String, Void, Propietario> {
         @Override
         protected Propietario doInBackground(String... datos) {
@@ -134,7 +142,7 @@ public class PerfilViewModel extends AndroidViewModel {
                 obj.put("dni", datos[2]);
                 obj.put("telefono", datos[3]);
                 obj.put("email", datos[4]);
-                obj.put("clave", propietario.getValue() != null ? propietario.getValue().getClave() : "");
+                obj.put("clave", JSONObject.NULL); // clave siempre null
                 String json = obj.toString();
                 java.io.OutputStream os = conn.getOutputStream();
                 os.write(json.getBytes("UTF-8"));
@@ -164,6 +172,7 @@ public class PerfilViewModel extends AndroidViewModel {
             }
             return null;
         }
+        // actualizo los livedata y desactivo el modo edicion tras guardar
         @Override
         protected void onPostExecute(Propietario p) {
             if (p != null) {
@@ -179,7 +188,7 @@ public class PerfilViewModel extends AndroidViewModel {
         }
     }
 
-    // Métodos para actualizar los LiveData desde el fragment
+    // defino los metodos para actualizar los livedata desde el fragmento
     public void setNombre(String value) { nombre.setValue(value); }
     public void setApellido(String value) { apellido.setValue(value); }
     public void setDni(String value) { dni.setValue(value); }
@@ -187,6 +196,7 @@ public class PerfilViewModel extends AndroidViewModel {
     public void setEmail(String value) { email.setValue(value); }
     public void toastMostrado() { mostrarToast.setValue(false); }
 
+    // gestiono la logica del boton editar/guardar segun el modo edicion
     public void onBotonEditarGuardar(String nombre, String apellido, String dni, String telefono) {
         if (modoEdicion.getValue() != null && modoEdicion.getValue()) {
             setNombre(nombre);

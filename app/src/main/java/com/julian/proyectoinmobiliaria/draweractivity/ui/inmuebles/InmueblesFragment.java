@@ -12,11 +12,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.julian.proyectoinmobiliaria.R;
+import com.julian.proyectoinmobiliaria.model.Inmueble;
+
+import java.util.ArrayList;
 
 public class InmueblesFragment extends Fragment {
 
     private InmueblesViewModel mViewModel;
+    private RecyclerView recyclerView;
+    private InmueblesAdapter adapter;
 
     public static InmueblesFragment newInstance() {
         return new InmueblesFragment();
@@ -25,14 +33,24 @@ public class InmueblesFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_inmuebles, container, false);
+        View view = inflater.inflate(R.layout.fragment_inmuebles, container, false);
+        recyclerView = view.findViewById(R.id.recyclerInmuebles);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new InmueblesAdapter(new ArrayList<Inmueble>());
+        recyclerView.setAdapter(adapter);
+        return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(InmueblesViewModel.class);
-        // TODO: Use the ViewModel
+        mViewModel.getInmueblesLiveData().observe(getViewLifecycleOwner(), inmuebles -> {
+            if (inmuebles != null) {
+                adapter.setInmuebles(inmuebles);
+            }
+        });
+        mViewModel.cargarInmuebles();
     }
 
 }

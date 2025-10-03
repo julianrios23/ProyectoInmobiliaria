@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -115,5 +116,18 @@ public class LoginActivityViewModel extends AndroidViewModel {
                 Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    // Método para verificar los campos y ocultar el teclado
+    public void checkFieldsAndHideKeyboard(String usuario, String clave, Context context) {
+        if (!usuario.isEmpty() && !clave.isEmpty()) {
+            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null && context instanceof android.app.Activity) {
+                android.view.View view = ((android.app.Activity) context).getCurrentFocus();
+                if (view != null) {
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
+            }
+        }
     }
 }

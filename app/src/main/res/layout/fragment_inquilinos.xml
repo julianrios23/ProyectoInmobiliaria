@@ -3,11 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/black"
     tools:context=".draweractivity.ui.inquilinos.InquilinosFragment">
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Hello" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="InquilinosFragment"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:layout_gravity="center" />
 
 </FrameLayout>

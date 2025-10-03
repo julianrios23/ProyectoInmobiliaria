@@ -13,6 +13,8 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+import com.julian.proyectoinmobiliaria.draweractivity.ui.perfil.PerfilViewModel;
 
 import com.julian.proyectoinmobiliaria.R;
 import com.julian.proyectoinmobiliaria.databinding.ActivityDrawerBinding;
@@ -42,10 +44,28 @@ public class DrawerActivity extends AppCompatActivity {
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
         View headerView = navigationView.getHeaderView(0);
-        android.widget.TextView emailTextView = headerView.findViewById(R.id.textView);
-        android.content.SharedPreferences prefs = getSharedPreferences("token_prefs", MODE_PRIVATE);
-        String email = prefs.getString("email", "");
-        emailTextView.setText(email);
+        // Obtenemos los TextView del header para mostrar nombre y email
+        android.widget.TextView tvNombreApellido = headerView.findViewById(R.id.tvNombreApellido);
+        android.widget.TextView tvMail2 = headerView.findViewById(R.id.tvMail2);
+
+        // Instanciamos el ViewModel para obtener los datos del usuario
+        PerfilViewModel perfilViewModel = new ViewModelProvider(this).get(PerfilViewModel.class);
+        // Cargamos el perfil del usuario desde la API
+        perfilViewModel.cargarPerfil();
+        // Observamos los datos del ViewModel y actualizamos los TextView
+        perfilViewModel.getNombre().observe(this, nombre -> {
+            String apellido = perfilViewModel.getApellido().getValue();
+            if (apellido == null) apellido = "";
+            tvNombreApellido.setText(nombre + " " + apellido); // Muestra el nombre completo
+        });
+        perfilViewModel.getApellido().observe(this, apellido -> {
+            String nombre = perfilViewModel.getNombre().getValue();
+            if (nombre == null) nombre = "";
+            tvNombreApellido.setText(nombre + " " + apellido); // Actualiza si cambia el apellido
+        });
+        perfilViewModel.getEmail().observe(this, email -> {
+            tvMail2.setText(email); // Muestra el email del usuario
+        });
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
@@ -94,5 +114,13 @@ public class DrawerActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_drawer);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Actualiza los datos del usuario cada vez que se muestra DrawerActivity
+        PerfilViewModel perfilViewModel = new ViewModelProvider(this).get(PerfilViewModel.class);
+        perfilViewModel.cargarPerfil();
     }
 }

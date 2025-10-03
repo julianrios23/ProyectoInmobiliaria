@@ -5,9 +5,11 @@
     android:layout_height="match_parent"
     tools:context=".draweractivity.ui.inmuebles.InmueblesFragment">
 
-    <TextView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerInmuebles"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Hello" />
+        android:padding="8dp"
+        tools:listitem="@layout/item_inmueble" />
 
 </FrameLayout>
