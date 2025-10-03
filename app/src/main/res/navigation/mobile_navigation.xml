@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_home">
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="com.julian.proyectoinmobiliaria.draweractivity.ui.home.HomeFragment"
+        android:label="@string/menu_home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/nav_perfil"
+        android:name="com.julian.proyectoinmobiliaria.draweractivity.ui.perfil.PerfilFragment"
+        android:label="Perfil"
+        tools:layout="@layout/fragment_perfil" />
+    <fragment
+        android:id="@+id/inmueblesFragment"
+        android:name="com.julian.proyectoinmobiliaria.draweractivity.ui.inmuebles.InmueblesFragment"
+        android:label="fragment_inmuebles"
+        tools:layout="@layout/fragment_inmuebles" />
+    <fragment
+        android:id="@+id/inquilinosFragment"
+        android:name="com.julian.proyectoinmobiliaria.draweractivity.ui.inquilinos.InquilinosFragment"
+        android:label="fragment_inquilinos"
+        tools:layout="@layout/fragment_inquilinos" />
+    <fragment
+        android:id="@+id/contratosFragment"
+        android:name="com.julian.proyectoinmobiliaria.draweractivity.ui.contratos.ContratosFragment"
+        android:label="fragment_contratos"
+        tools:layout="@layout/fragment_contratos" />
+    <fragment
+        android:id="@+id/nav_logout"
+        android:name="com.julian.proyectoinmobiliaria.draweractivity.ui.logout.LogoutFragment"
+        android:label="fragment_logout"
+        tools:layout="@layout/fragment_logout" />
+
+</navigation>
