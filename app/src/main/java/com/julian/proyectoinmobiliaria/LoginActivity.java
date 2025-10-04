@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -49,8 +50,15 @@ public class LoginActivity extends AppCompatActivity {
             // Llama al método login del ViewModel
             vm.login(usuario, clave);
         });
-        // Observa el resultado del login para navegar a DrawerActivity si es exitoso
+        // Observa el resultado del login para ir a DrawerActivity si es exitoso
         vm.handleLoginResult(this);
 
+        // Migración: manejar retroceso con OnBackPressedDispatcher
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                vm.handleBackPressed(LoginActivity.this);
+            }
+        });
     }
 }

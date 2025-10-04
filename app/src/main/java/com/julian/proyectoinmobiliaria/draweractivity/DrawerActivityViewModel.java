@@ -1,0 +1,123 @@
+package com.julian.proyectoinmobiliaria.draweractivity;
+
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.LiveData;
+
+public class DrawerActivityViewModel extends AndroidViewModel {
+    private final MutableLiveData<Boolean> mostrarLogout = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> cerrarApp = new MutableLiveData<>(false);
+    private final MutableLiveData<String> nombreApellido = new MutableLiveData<>("");
+    private final MutableLiveData<String> email = new MutableLiveData<>("");
+
+    public DrawerActivityViewModel(android.app.Application application) {
+        super(application);
+    }
+
+    // este metodo lo llamo para actualizar el nombre y apellido
+    public void actualizarNombreApellido(String nombre, String apellido) {
+        if (nombre == null) nombre = "";
+        if (apellido == null) apellido = "";
+        nombreApellido.setValue(nombre + " " + apellido);
+    }
+
+    // este metodo lo llamo para actualizar el email
+    public void actualizarEmail(String mail) {
+        if (mail == null) mail = "";
+        email.setValue(mail);
+    }
+
+    // este metodo lo llamo desde el activity para observar el nombre y apellido
+    public LiveData<String> getNombreApellido() {
+        return nombreApellido;
+    }
+
+    // este metodo lo llamo desde el activity para observar el email
+    public LiveData<String> getEmail() {
+        return email;
+    }
+
+    // este metodo verifica si el usuario esta logueado y si debe mostrar el fragmento de logout
+    public void manejarBackPressed() {
+        android.content.SharedPreferences prefs = getApplication().getSharedPreferences("datos", android.content.Context.MODE_PRIVATE);
+        boolean logueado = prefs.getBoolean("logueado", false);
+        androidx.fragment.app.FragmentActivity activity = (androidx.fragment.app.FragmentActivity) getApplication().getSystemService(android.content.Context.ACTIVITY_SERVICE);
+        if (activity != null) {
+            androidx.fragment.app.Fragment currentFragment = activity.getSupportFragmentManager().findFragmentById(com.julian.proyectoinmobiliaria.R.id.nav_host_fragment_content_drawer);
+            if (logueado) {
+                if (!(currentFragment instanceof com.julian.proyectoinmobiliaria.draweractivity.ui.logout.LogoutFragment)) {
+                    mostrarLogout.setValue(true);
+                }
+            } else {
+                cerrarApp.setValue(true);
+            }
+        }
+    }
+
+    // este metodo lo llamo desde el activity para saber si debo mostrar el fragmento de logout
+    public LiveData<Boolean> getMostrarLogout() {
+        return mostrarLogout;
+    }
+
+    // este metodo lo llamo desde el activity para saber si debo cerrar la app
+    public LiveData<Boolean> getCerrarApp() {
+        return cerrarApp;
+    }
+
+    // este metodo lo llamo para resetear los flags despues de usarlos
+    public void resetFlags() {
+        mostrarLogout.setValue(false);
+        cerrarApp.setValue(false);
+    }
+
+    // este metodo maneja la navegacion del menu
+    public void manejarMenu(android.view.MenuItem item, androidx.fragment.app.FragmentActivity activity, androidx.drawerlayout.widget.DrawerLayout drawerLayout) {
+        int id = item.getItemId();
+        if (id == com.julian.proyectoinmobiliaria.R.id.nav_logout) {
+            activity.getSupportFragmentManager().beginTransaction()
+                .replace(com.julian.proyectoinmobiliaria.R.id.nav_host_fragment_content_drawer, new com.julian.proyectoinmobiliaria.draweractivity.ui.logout.LogoutFragment())
+                .addToBackStack(null)
+                .commit();
+            drawerLayout.closeDrawers();
+        } else {
+            androidx.navigation.NavController navController = androidx.navigation.Navigation.findNavController(activity, com.julian.proyectoinmobiliaria.R.id.nav_host_fragment_content_drawer);
+            boolean handled = androidx.navigation.ui.NavigationUI.onNavDestinationSelected(item, navController);
+            if (handled) {
+                drawerLayout.closeDrawers();
+            }
+        }
+    }
+
+    // este metodo ejecuta la accion de mostrar logout
+    public void ejecutarAccionLogout(androidx.fragment.app.FragmentActivity activity, Boolean mostrar) {
+        if (Boolean.TRUE.equals(mostrar)) {
+            activity.getSupportFragmentManager().beginTransaction()
+                .replace(com.julian.proyectoinmobiliaria.R.id.nav_host_fragment_content_drawer, new com.julian.proyectoinmobiliaria.draweractivity.ui.logout.LogoutFragment())
+                .addToBackStack(null)
+                .commit();
+            resetFlags();
+        }
+    }
+
+    // este metodo ejecuta la accion de cerrar la app
+    public void ejecutarAccionCerrar(androidx.fragment.app.FragmentActivity activity, Boolean cerrar) {
+        if (Boolean.TRUE.equals(cerrar)) {
+            activity.finish();
+            resetFlags();
+        }
+    }
+
+    // este metodo maneja el back
+    public void manejarBackPressed(androidx.fragment.app.FragmentActivity activity) {
+        android.content.SharedPreferences prefs = activity.getSharedPreferences("datos", android.content.Context.MODE_PRIVATE);
+        boolean logueado = prefs.getBoolean("logueado", false);
+        androidx.fragment.app.Fragment currentFragment = activity.getSupportFragmentManager().findFragmentById(com.julian.proyectoinmobiliaria.R.id.nav_host_fragment_content_drawer);
+        if (logueado) {
+            if (!(currentFragment instanceof com.julian.proyectoinmobiliaria.draweractivity.ui.logout.LogoutFragment)) {
+                mostrarLogout.setValue(true);
+            }
+        } else {
+            cerrarApp.setValue(true);
+        }
+    }
+}

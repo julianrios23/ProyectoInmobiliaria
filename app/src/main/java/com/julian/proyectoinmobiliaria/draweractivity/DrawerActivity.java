@@ -82,7 +82,7 @@ public class DrawerActivity extends AppCompatActivity {
             android.util.Log.d("OUT", "Menu seleccionado: " + id);
             if (id == R.id.nav_logout) {
                 android.util.Log.d("OUT", "Logout seleccionado");
-                // Navegar manualmente al fragmento de logout
+                // Navegar manualmente al fragment de logout
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.nav_host_fragment_content_drawer, new com.julian.proyectoinmobiliaria.draweractivity.ui.logout.LogoutFragment())
                         .addToBackStack(null)
@@ -99,6 +99,36 @@ public class DrawerActivity extends AppCompatActivity {
                 drawer1.closeDrawers();
             }
             return handled;
+        });
+        // inicializo el viewmodel para delegar toda la logica
+        DrawerActivityViewModel viewModel = new ViewModelProvider(this).get(DrawerActivityViewModel.class);
+        // observo si debo mostrar el nombre y apellido
+        viewModel.getNombreApellido().observe(this, nombreApellido -> {
+            tvNombreApellido.setText(nombreApellido);
+        });
+        // observo si debo mostrar el email
+        viewModel.getEmail().observe(this, email -> {
+            tvMail2.setText(email);
+        });
+        // observo si debo mostrar el fragment de logout
+        viewModel.getMostrarLogout().observe(this, mostrar -> {
+            viewModel.ejecutarAccionLogout(this, mostrar);
+        });
+        // observo si debo cerrar la app
+        viewModel.getCerrarApp().observe(this, cerrar -> {
+            viewModel.ejecutarAccionCerrar(this, cerrar);
+        });
+        // delego el manejo del back al viewmodel
+        getOnBackPressedDispatcher().addCallback(this, new androidx.activity.OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                viewModel.manejarBackPressed(DrawerActivity.this);
+            }
+        });
+        // delego la navegacion del menu al viewmodel
+        navigationView.setNavigationItemSelectedListener(item -> {
+            viewModel.manejarMenu(item, DrawerActivity.this, binding.drawerLayout);
+            return true;
         });
     }
 

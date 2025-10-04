@@ -15,17 +15,10 @@ import androidx.lifecycle.MutableLiveData;
 
 
 import com.julian.proyectoinmobiliaria.draweractivity.DrawerActivity;
-import com.julian.proyectoinmobiliaria.login.LoginApi;
-import com.julian.proyectoinmobiliaria.login.LoginRequest;
-import com.google.gson.Gson;
+import com.julian.proyectoinmobiliaria.service.LoginApi;
 
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.ResponseBody;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
-import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,6 +43,10 @@ public class LoginActivityViewModel extends AndroidViewModel {
     // inicialicé el ViewModel y configuré Retrofit con un interceptor para agregar headers y los convertidores necesarios.
     public LoginActivityViewModel(@NonNull Application application) {
         super(application);
+        /*ese bloque crea y configura un cliente okhttp para las solicitudes http. le pongo tiempos de espera de 30 segundos
+         para conectar, leer y escribir. agrego un interceptor que añade la cabecera "content-type: application/json" a cada solicitud,
+          asegurando que los datos se envien en formato json.*/
+
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
                 .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
@@ -63,9 +60,14 @@ public class LoginActivityViewModel extends AndroidViewModel {
                     return chain.proceed(request);
                 })
                 .build();
+        /*crea una instancia de retrofit configurando la url base de la api, el cliente http personalizado y dos convertidores:
+        uno para manejar respuestas como texto plano (scalars) y otro para manejar respuestas en formato json (gson).
+        luego genero la implementacion de la interfaz loginapi y obtengo las preferencias compartidas para guardar el token.*/
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://inmobiliariaulp-amb5hwfqaraweyga.canadacentral-01.azurewebsites.net/")
                 .client(client)
+                // ambos convertidores: Scalars para respuestas de texto plano y Gson para JSON
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -87,7 +89,7 @@ public class LoginActivityViewModel extends AndroidViewModel {
                     loginResult.postValue("success");
                 } else {
                     try {
-                        response.errorBody().string(); // Solo para consumir el error, sin log
+                        response.errorBody().string(); // para consumir el error, sin log
                     } catch (Exception e) {
                         // No hacer nada
                     }
@@ -128,6 +130,23 @@ public class LoginActivityViewModel extends AndroidViewModel {
                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 }
             }
+        }
+    }
+
+    // doble pulsación atrás  delegada
+    private long lastBackPressedTime = 0;
+    private static final int DOUBLE_PRESS_INTERVAL = 2000;
+
+    public void handleBackPressed(Context context) {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastBackPressedTime < DOUBLE_PRESS_INTERVAL) {
+            lastBackPressedTime = 0;
+            if (context instanceof android.app.Activity) {
+                ((android.app.Activity) context).finishAffinity();
+            }
+        } else {
+            lastBackPressedTime = currentTime;
+            Toast.makeText(context, "Presione dos veces para salir", Toast.LENGTH_SHORT).show();
         }
     }
 }

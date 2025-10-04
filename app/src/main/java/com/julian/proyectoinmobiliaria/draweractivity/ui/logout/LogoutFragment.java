@@ -25,29 +25,17 @@ public class LogoutFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        android.util.Log.d("OUT", "onCreateView de LogoutFragment");
+
         com.julian.proyectoinmobiliaria.databinding.FragmentLogoutBinding binding = com.julian.proyectoinmobiliaria.databinding.FragmentLogoutBinding.inflate(inflater, container, false);
         mViewModel = new ViewModelProvider(this).get(LogoutViewModel.class);
         mViewModel.iniciarLogout(requireContext(), binding);
         // aqui observo el livedata para mostrar el dialogo de confirmacion
         mViewModel.getConfirmLogoutLiveData().observe(getViewLifecycleOwner(), show -> {
-            android.util.Log.d("OUT", "Observer confirmLogoutLiveData: " + show);
-            if (show != null && show) {
-                new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                        .setTitle("Confirmar !!")
-                        .setMessage("¿Deseas cerrar sesion?")
-                        .setPositiveButton("Si", (dialog, which) -> mViewModel.confirmarLogout())
-                        .setNegativeButton("No", (dialog, which) -> {
-                            mViewModel.cancelarLogout();
-                            // Navegar a Home al cancelar usando binding
-                            androidx.navigation.NavController navController = androidx.navigation.Navigation.findNavController(binding.getRoot());
-                            navController.navigate(binding.getRoot().getResources().getIdentifier("nav_home", "id", binding.getRoot().getContext().getPackageName()));
-                        })
-                        .setCancelable(false)
-                        .show();
-                // aqui reseteo el livedata para evitar mostrar multiples dialogos
-                mViewModel.getConfirmLogoutLiveData().setValue(false);
-            }
+            mViewModel.mostrarDialogoLogout(requireContext());
+        });
+        // aqui observo el livedata para navegar a inicio (mapa)
+        mViewModel.getNavigateToInicioLiveData().observe(getViewLifecycleOwner(), goToInicio -> {
+            mViewModel.navegarInicio(requireActivity());
         });
         return binding.getRoot();
     }

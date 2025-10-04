@@ -3,7 +3,6 @@ package com.julian.proyectoinmobiliaria.draweractivity.ui.logout;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -18,6 +17,8 @@ public class LogoutViewModel extends AndroidViewModel {
     private MutableLiveData<String> logoutMessageLiveData = new MutableLiveData<>();
     // aqui uso un livedata para manejar la confirmacion del logout
     private MutableLiveData<Boolean> confirmLogoutLiveData = new MutableLiveData<>();
+    // LiveData para navegar a la vista de inicio (mapa)
+    private MutableLiveData<Boolean> navigateToInicioLiveData = new MutableLiveData<>();
 
     public LogoutViewModel(@NonNull Application application) {
         super(application);
@@ -38,6 +39,15 @@ public class LogoutViewModel extends AndroidViewModel {
     // aqui expongo el livedata para la confirmacion del logout
     public MutableLiveData<Boolean> getConfirmLogoutLiveData() {
         return confirmLogoutLiveData;
+    }
+    // Exponer el LiveData para navegar a inicio
+    public MutableLiveData<Boolean> getNavigateToInicioLiveData() {
+        return navigateToInicioLiveData;
+    }
+
+    // Método para activar la navegación a inicio (mapa)
+    public void onCancelLogout() {
+        navigateToInicioLiveData.setValue(true);
     }
 
     // aqui implemento el metodo para manejar toda la logica de logout desde el viewmodel
@@ -60,24 +70,35 @@ public class LogoutViewModel extends AndroidViewModel {
         logoutMessageLiveData.setValue("");
     }
 
-
-
-
-    // aseguro que confirmarLogout y cancelarLogout sean publicos para que el fragmento pueda llamarlos
-    public void confirmarLogout() {
-        // aqui realizo el logout borrando las preferencias
-        SharedPreferences prefs = getApplication().getSharedPreferences("user_session", Context.MODE_PRIVATE);
-        prefs.edit().clear().apply();
-        // aqui notifico que el logout fue exitoso
-        logoutLiveData.setValue(true);
-        // aqui muestro el mensaje de sesion cerrada
-        logoutMessageLiveData.setValue("sesion cerrada correctamente");
-        // aqui navego a la pantalla de login
-        navigateToLoginLiveData.setValue(true);
+    // aqui muestro el dialogo de logout desde el viewmodel
+    public void mostrarDialogoLogout(Context context) {
+        if (confirmLogoutLiveData.getValue() != null && confirmLogoutLiveData.getValue()) {
+            new androidx.appcompat.app.AlertDialog.Builder(context)
+                    .setTitle("Confirmar !!")
+                    .setMessage("¿Deseas cerrar sesion?")
+                    .setPositiveButton("Si", (dialog, which) -> {
+                        // aqui solo cierro el dialogo y navego a login usando el livedata
+                        navigateToLoginLiveData.setValue(true);
+                        logoutMessageLiveData.setValue("sesion cerrada correctamente");
+                    })
+                    .setNegativeButton("No", (dialog, which) -> {
+                        dialog.dismiss();
+                        onCancelLogout();
+                    })
+                    .show();
+        }
     }
-    public void cancelarLogout() {
-        // aqui limpio el mensaje y no hago nada mas
-        logoutMessageLiveData.setValue("");
-        confirmLogoutLiveData.setValue(false);
+
+    // aqui navego a la pantalla de inicio desde el viewmodel
+    public void navegarInicio(android.app.Activity activity) {
+        if (navigateToInicioLiveData.getValue() != null && navigateToInicioLiveData.getValue()) {
+            androidx.appcompat.app.AppCompatActivity compatActivity = (androidx.appcompat.app.AppCompatActivity) activity;
+            compatActivity.getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(com.julian.proyectoinmobiliaria.R.id.nav_host_fragment_content_drawer, new com.julian.proyectoinmobiliaria.draweractivity.ui.inicio.HomeFragment())
+                    .addToBackStack(null)
+                    .commit();
+            navigateToInicioLiveData.setValue(false);
+        }
     }
 }

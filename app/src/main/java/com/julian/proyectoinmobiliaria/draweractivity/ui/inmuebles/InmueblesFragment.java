@@ -20,19 +20,21 @@ import com.julian.proyectoinmobiliaria.model.Inmueble;
 
 import java.util.ArrayList;
 
+// defino el fragment y las variables para el viewmodel, el recyclerview y el adaptador
 public class InmueblesFragment extends Fragment {
 
     private InmueblesViewModel mViewModel;
     private RecyclerView recyclerView;
     private InmueblesAdapter adapter;
 
+    // creo una nueva instancia del fragment
     public static InmueblesFragment newInstance() {
         return new InmueblesFragment();
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // inflo la vista del fragment y configuro el recyclerview
         View view = inflater.inflate(R.layout.fragment_inmuebles, container, false);
         recyclerView = view.findViewById(R.id.recyclerInmuebles);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

@@ -10,10 +10,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.julian.proyectoinmobiliaria.model.Inmueble;
+import com.julian.proyectoinmobiliaria.service.InmueblesApi;
 
 import java.util.List;
 
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import retrofit2.Call;
@@ -27,9 +27,11 @@ public class InmueblesViewModel extends AndroidViewModel {
     private final InmueblesApi inmueblesApi;
     private final SharedPreferences prefs;
 
+    // inicializo el viewmodel y obtengo las preferencias compartidas para el token
     public InmueblesViewModel(@NonNull Application application) {
         super(application);
         prefs = application.getSharedPreferences("token_prefs", Context.MODE_PRIVATE);
+        // configuro el cliente okhttp para agregar el token en la cabecera de cada solicitud
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(chain -> {
                     Request original = chain.request();
@@ -41,6 +43,7 @@ public class InmueblesViewModel extends AndroidViewModel {
                     return chain.proceed(request);
                 })
                 .build();
+        // creo la instancia de retrofit usando la url base y el cliente configurado
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://inmobiliariaulp-amb5hwfqaraweyga.canadacentral-01.azurewebsites.net/")
                 .client(client)
@@ -49,18 +52,22 @@ public class InmueblesViewModel extends AndroidViewModel {
         inmueblesApi = retrofit.create(InmueblesApi.class);
     }
 
+    // devuelvo el livedata que contiene la lista de inmuebles
     public LiveData<List<Inmueble>> getInmueblesLiveData() {
         return inmueblesLiveData;
     }
 
+    // defino el metodo para cargar los inmuebles desde la api
     public void cargarInmuebles() {
         String token = prefs.getString("token", "");
         inmueblesApi.obtenerInmuebles("Bearer " + token).enqueue(new Callback<List<Inmueble>>() {
             @Override
             public void onResponse(Call<List<Inmueble>> call, Response<List<Inmueble>> response) {
+                // si la respuesta es exitosa y contiene datos, actualizo el livedata
                 if (response.isSuccessful() && response.body() != null) {
                     inmueblesLiveData.postValue(response.body());
                 } else {
+                    // si no, lo actualizo con null
                     inmueblesLiveData.postValue(null);
                 }
             }
