@@ -17,11 +17,11 @@
             android:icon="@drawable/inmueble"
             android:title="Inmuebles" />
         <item
-            android:id="@+id/nav_inquilinos"
+            android:id="@+id/inquilinosFragment"
             android:icon="@drawable/inquilino"
             android:title="Inquilinos" />
         <item
-            android:id="@+id/nav_contratos"
+            android:id="@+id/contratosFragment"
             android:icon="@drawable/contrato"
             android:title="Contratos" />
         <item

@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,7 @@ public class InmueblesFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(InmueblesViewModel.class);
         mViewModel.getInmueblesLiveData().observe(getViewLifecycleOwner(), inmuebles -> {
+            Log.d("InmueblesFragment", "observer: inmuebles=" + (inmuebles == null ? "null" : ("size=" + inmuebles.size())));
             if (inmuebles != null) {
                 adapter.setInmuebles(inmuebles);
             }

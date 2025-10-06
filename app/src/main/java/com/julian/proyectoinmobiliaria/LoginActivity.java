@@ -1,9 +1,6 @@
 package com.julian.proyectoinmobiliaria;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,7 +8,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.julian.proyectoinmobiliaria.databinding.ActivityLoginBinding;
 import com.julian.proyectoinmobiliaria.LoginActivityViewModel;
-import com.julian.proyectoinmobiliaria.draweractivity.DrawerActivity;
 
 public class LoginActivity extends AppCompatActivity {
     private ActivityLoginBinding binding;
@@ -22,9 +18,17 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // Inicia el binding para acceder a las vistas
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        super.setContentView(binding.getRoot());
         // Obtiene el ViewModel asociado a esta actividad
         vm = new ViewModelProvider(this).get(LoginActivityViewModel.class);
+
+        // Inicializa el detector de shake para llamada
+        vm.setCallPermissionChecker(this::checkAndRequestCallPermission);
+        vm.setOnShakeCall(() -> {
+
+            checkAndRequestCallPermission();
+        });
+        vm.initShakeDetector(this);
 
         // oculta el teclado cuando ambos campos se rellenan
         android.text.TextWatcher watcher = new android.text.TextWatcher() {
@@ -50,15 +54,34 @@ public class LoginActivity extends AppCompatActivity {
             // Llama al método login del ViewModel
             vm.login(usuario, clave);
         });
-        // Observa el resultado del login para ir a DrawerActivity si es exitoso
+        // observer el resultado del login para ir a DrawerActivity si es exitoso
         vm.handleLoginResult(this);
 
-        // Migración: manejar retroceso con OnBackPressedDispatcher
+        // Delegar la observación del permiso de llamada al ViewModel
+        vm.handleCallPermissionResult(this);
+
+        // manejar retroceso con OnBackPressedDispatcher
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 vm.handleBackPressed(LoginActivity.this);
             }
         });
+    }
+
+    private void checkAndRequestCallPermission() {
+        vm.checkAndRequestCallPermission(this);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        vm.handleRequestPermissionsResult(requestCode, grantResults);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        vm.releaseShakeDetector();
     }
 }

@@ -1,9 +1,15 @@
 package com.julian.proyectoinmobiliaria;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.net.Uri;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
@@ -44,26 +50,11 @@ public class LoginActivityViewModel extends AndroidViewModel {
     // inicialicé el ViewModel y configuré Retrofit con un interceptor para agregar headers y los convertidores necesarios.
     public LoginActivityViewModel(@NonNull Application application) {
         super(application);
-        /*ese bloque crea y configura un cliente okhttp para las solicitudes http. le pongo tiempos de espera de 30 segundos
-         para conectar, leer y escribir. agrego un interceptor que añade la cabecera "content-type: application/json" a cada solicitud,
-          asegurando que los datos se envien en formato json.*/
 
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
-                .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
-                .writeTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
-                .addInterceptor(chain -> {
-                    Request original = chain.request();
-                    Request request = original.newBuilder()
-                            .header("Content-Type", "application/json")
-                            .method(original.method(), original.body())
-                            .build();
-                    return chain.proceed(request);
-                })
-                .build();
 
-        // uso apiservice.getapiservice() para centralizar la instancia de retrofit y su interface. no creo la instancia manualmente aqui.
-        loginApi = ApiService.getApiService();
+        // Uso el cliente por defecto centralizado en ApiService
+        OkHttpClient client = ApiService.getDefaultClient();
+        loginApi = ApiService.getApiService(client);
         prefs = application.getSharedPreferences("token_prefs", Context.MODE_PRIVATE);
     }
 
@@ -139,6 +130,113 @@ public class LoginActivityViewModel extends AndroidViewModel {
         } else {
             lastBackPressedTime = currentTime;
             Toast.makeText(context, "Presione dos veces para salir", Toast.LENGTH_SHORT).show();
+        }
+    }
+    //bloque llamada por sensor movimiento
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
+    private SensorEventListener shakeListener;
+    private boolean isShakeInitialized = false;
+    private static final float SHAKE_THRESHOLD = 6.0f; // sensibilidad predeterminada
+    private static final int SHAKE_WAIT_TIME_MS = 500;
+    private long mShakeTime = 0;
+
+    // Callback para pedir permiso de llamada
+    private Runnable callPermissionChecker;
+    public void setCallPermissionChecker(Runnable checker) {
+        this.callPermissionChecker = checker;
+    }
+
+    // Callback para iniciar la llamada al detectar shake
+    private Runnable onShakeCall;
+    public void setOnShakeCall(Runnable callback) {
+        this.onShakeCall = callback;
+    }
+
+    // Inicializa el sensor y el listener de shake
+    public void initShakeDetector(Activity activity) {
+        if (isShakeInitialized) return;
+        sensorManager = (SensorManager) activity.getSystemService(Context.SENSOR_SERVICE);
+        if (sensorManager == null) return;
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        if (accelerometer == null) return;
+        shakeListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                float x = event.values[0];
+                float y = event.values[1];
+                float z = event.values[2];
+                float gX = x / SensorManager.GRAVITY_EARTH;
+                float gY = y / SensorManager.GRAVITY_EARTH;
+                float gZ = z / SensorManager.GRAVITY_EARTH;
+                float gForce = (float) Math.sqrt(gX * gX + gY * gY + gZ * gZ);
+                if (gForce > SHAKE_THRESHOLD) {
+                    long now = System.currentTimeMillis();
+                    if (mShakeTime + SHAKE_WAIT_TIME_MS < now) {
+                        mShakeTime = now;
+                        if (onShakeCall != null) {
+                            onShakeCall.run();
+                        }
+                    }
+                }
+            }
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+        };
+        sensorManager.registerListener(shakeListener, accelerometer, SensorManager.SENSOR_DELAY_UI);
+        isShakeInitialized = true;
+    }
+
+    // LiveData para el estado del permiso de llamada
+    private final MutableLiveData<Boolean> callPermissionGranted = new MutableLiveData<>();
+    public LiveData<Boolean> getCallPermissionGranted() {
+        return callPermissionGranted;
+    }
+
+    // Verifica y solicita el permiso de llamada
+    public void checkAndRequestCallPermission(Activity activity) {
+        if (androidx.core.content.ContextCompat.checkSelfPermission(activity, android.Manifest.permission.CALL_PHONE) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            androidx.core.app.ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.CALL_PHONE}, 1001);
+        } else {
+            callPermissionGranted.postValue(true);
+        }
+    }
+
+    // Maneja el resultado de la solicitud de permisos
+    public void handleRequestPermissionsResult(int requestCode, int[] grantResults) {
+        if (requestCode == 1001) {
+            if (grantResults.length > 0 && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                callPermissionGranted.postValue(true);
+            } else {
+                callPermissionGranted.postValue(false);
+            }
+        }
+    }
+
+    // Método para realizar la llamada
+    public void makeCall(Activity activity) {
+        String nro = "151515";
+        Intent intent = new Intent(Intent.ACTION_CALL);
+        intent.setData(Uri.parse("tel:" + nro));
+        activity.startActivity(intent);
+    }
+
+    // Observa el resultado del permiso de llamada y ejecuta la acción
+    public void handleCallPermissionResult(Activity activity) {
+        getCallPermissionGranted().observeForever(granted -> {
+            if (granted != null && granted) {
+                makeCall(activity);
+            } else if (granted != null && !granted) {
+                Toast.makeText(activity, "Permiso de llamada denegado", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // Liberar el sensor (llamar en onDestroy de la Activity)
+    public void releaseShakeDetector() {
+        if (sensorManager != null && shakeListener != null) {
+            sensorManager.unregisterListener(shakeListener);
+            isShakeInitialized = false;
         }
     }
 }

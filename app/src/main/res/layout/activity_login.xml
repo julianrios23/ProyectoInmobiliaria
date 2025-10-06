@@ -87,7 +87,7 @@
         android:id="@+id/btnIniciar"
         android:layout_width="195dp"
         android:layout_height="50dp"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="32dp"
         android:backgroundTint="@color/olive"
         android:fontFamily="sans-serif-medium"
         android:text="Iniciar Sesión"
@@ -101,7 +101,7 @@
         android:id="@+id/textView4"
         android:layout_width="204dp"
         android:layout_height="36dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="12dp"
         android:fontFamily="sans-serif-medium"
         android:text="Olvido su contraseña?"
         android:textAlignment="center"
@@ -110,5 +110,19 @@
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnIniciar" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="406dp"
+        android:layout_height="27dp"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Asesoría Personalizada? Agite el telefono"
+        android:textAlignment="center"
+        android:textColor="@color/olive_accent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

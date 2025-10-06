@@ -18,13 +18,13 @@ public class DrawerActivityViewModel extends AndroidViewModel {
     public void actualizarNombreApellido(String nombre, String apellido) {
         if (nombre == null) nombre = "";
         if (apellido == null) apellido = "";
-        nombreApellido.setValue(nombre + " " + apellido);
+        nombreApellido.postValue(nombre + " " + apellido);
     }
 
     // este metodo lo llamo para actualizar el email
     public void actualizarEmail(String mail) {
         if (mail == null) mail = "";
-        email.setValue(mail);
+        email.postValue(mail);
     }
 
     // este metodo lo llamo desde el activity para observar el nombre y apellido
@@ -38,10 +38,10 @@ public class DrawerActivityViewModel extends AndroidViewModel {
     }
 
     // este metodo verifica si el usuario esta logueado y si debe mostrar el fragmento de logout
-    public void manejarBackPressed() {
+    // Ahora recibe la instancia de FragmentActivity como parámetro
+    public void manejarBackPressed(androidx.fragment.app.FragmentActivity activity) {
         android.content.SharedPreferences prefs = getApplication().getSharedPreferences("datos", android.content.Context.MODE_PRIVATE);
         boolean logueado = prefs.getBoolean("logueado", false);
-        androidx.fragment.app.FragmentActivity activity = (androidx.fragment.app.FragmentActivity) getApplication().getSystemService(android.content.Context.ACTIVITY_SERVICE);
         if (activity != null) {
             androidx.fragment.app.Fragment currentFragment = activity.getSupportFragmentManager().findFragmentById(com.julian.proyectoinmobiliaria.R.id.nav_host_fragment_content_drawer);
             if (logueado) {
@@ -104,20 +104,6 @@ public class DrawerActivityViewModel extends AndroidViewModel {
         if (Boolean.TRUE.equals(cerrar)) {
             activity.finish();
             resetFlags();
-        }
-    }
-
-    // este metodo maneja el back
-    public void manejarBackPressed(androidx.fragment.app.FragmentActivity activity) {
-        android.content.SharedPreferences prefs = activity.getSharedPreferences("datos", android.content.Context.MODE_PRIVATE);
-        boolean logueado = prefs.getBoolean("logueado", false);
-        androidx.fragment.app.Fragment currentFragment = activity.getSupportFragmentManager().findFragmentById(com.julian.proyectoinmobiliaria.R.id.nav_host_fragment_content_drawer);
-        if (logueado) {
-            if (!(currentFragment instanceof com.julian.proyectoinmobiliaria.draweractivity.ui.logout.LogoutFragment)) {
-                mostrarLogout.setValue(true);
-            }
-        } else {
-            cerrarApp.setValue(true);
         }
     }
 }

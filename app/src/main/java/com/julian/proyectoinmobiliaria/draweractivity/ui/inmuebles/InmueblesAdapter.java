@@ -1,5 +1,6 @@
 package com.julian.proyectoinmobiliaria.draweractivity.ui.inmuebles;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ public class InmueblesAdapter extends RecyclerView.Adapter<InmueblesAdapter.Inmu
     }
 
     public void setInmuebles(List<Inmueble> inmuebles) {
+        Log.d("InmueblesAdapter", "setInmuebles: " + (inmuebles == null ? "null" : ("size=" + inmuebles.size())));
         this.inmuebles = inmuebles;
         notifyDataSetChanged();
     }
@@ -36,26 +38,29 @@ public class InmueblesAdapter extends RecyclerView.Adapter<InmueblesAdapter.Inmu
 
     @Override
     public void onBindViewHolder(@NonNull InmuebleViewHolder holder, int position) {
-        Inmueble inmueble = inmuebles.get(position);
-        holder.tvDireccion.setText("Dirección: " + inmueble.getDireccion());
-        holder.tvUso.setText("Uso: " + inmueble.getUso());
-        holder.tvTipo.setText("Tipo: " + inmueble.getTipo());
-        holder.tvAmbientes.setText("Ambientes: " + inmueble.getAmbientes());
-        holder.tvSuperficie.setText("Superficie: " + inmueble.getSuperficie());
-        holder.tvLatitud.setText("Latitud: " + inmueble.getLatitud());
-        holder.tvLongitud.setText("Longitud: " + inmueble.getLongitud());
-        holder.tvValor.setText("Valor: $" + inmueble.getValor());
-        holder.tvDisponible.setText("Disponible: " + (inmueble.getDisponible() != null && inmueble.getDisponible() ? "Sí" : "No"));
-        holder.tvContratoVigente.setText("Contrato vigente: " + (inmueble.isTieneContratoVigente() ? "Sí" : "No"));
-        if (inmueble.getDuenio() != null) {
-            holder.tvDuenio.setText("Dueño: " + inmueble.getDuenio().getNombre());
-        } else {
-            holder.tvDuenio.setText("Dueño: -");
-        }
-        if (inmueble.getImagen() != null && !inmueble.getImagen().isEmpty()) {
-            Picasso.get().load(inmueble.getImagen().replace("\\", "/")).into(holder.ivImagen);
-        } else {
-            holder.ivImagen.setImageResource(R.drawable.home);
+        try {
+            Inmueble inmueble = inmuebles.get(position);
+            Log.d("InmueblesAdapter", "onBindViewHolder: pos=" + position + ", inmueble=" + inmueble);
+            holder.tvDireccion.setText("Dirección: " + inmueble.getDireccion());
+            holder.tvUso.setText("Uso: " + inmueble.getUso());
+            holder.tvTipo.setText("Tipo: " + inmueble.getTipo());
+            holder.tvAmbientes.setText("Ambientes: " + inmueble.getAmbientes());
+            holder.tvSuperficie.setText("Superficie: " + inmueble.getSuperficie());
+            holder.tvValor.setText("Valor: $" + inmueble.getValor());
+            holder.tvDisponible.setText("Disponible: " + (inmueble.getDisponible() != null && inmueble.getDisponible() ? "Sí" : "No"));
+            holder.tvContratoVigente.setText("Contrato vigente: " + (inmueble.isTieneContratoVigente() ? "Sí" : "No"));
+            if (inmueble.getDuenio() != null) {
+                holder.tvDuenio.setText("Dueño: " + inmueble.getDuenio().getNombre() + " " + inmueble.getDuenio().getApellido());
+            } else {
+                holder.tvDuenio.setText("Dueño: -");
+            }
+            if (inmueble.getImagen() != null && !inmueble.getImagen().isEmpty()) {
+                Picasso.get().load(inmueble.getImagen().replace("\\", "/")).into(holder.ivImagen);
+            } else {
+                holder.ivImagen.setImageResource(R.drawable.home);
+            }
+        } catch (Exception e) {
+            Log.e("InmueblesAdapter", "Error en onBindViewHolder pos=" + position, e);
         }
     }
 
@@ -65,7 +70,7 @@ public class InmueblesAdapter extends RecyclerView.Adapter<InmueblesAdapter.Inmu
     }
 
     static class InmuebleViewHolder extends RecyclerView.ViewHolder {
-        TextView tvDireccion, tvUso, tvTipo, tvAmbientes, tvSuperficie, tvLatitud, tvLongitud, tvValor, tvDisponible, tvContratoVigente, tvDuenio;
+        TextView tvDireccion, tvUso, tvTipo, tvAmbientes, tvSuperficie, tvValor, tvDisponible, tvContratoVigente, tvDuenio;
         ImageView ivImagen;
         public InmuebleViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -74,8 +79,6 @@ public class InmueblesAdapter extends RecyclerView.Adapter<InmueblesAdapter.Inmu
             tvTipo = itemView.findViewById(R.id.tvTipo);
             tvAmbientes = itemView.findViewById(R.id.tvAmbientes);
             tvSuperficie = itemView.findViewById(R.id.tvSuperficie);
-            tvLatitud = itemView.findViewById(R.id.tvLatitud);
-            tvLongitud = itemView.findViewById(R.id.tvLongitud);
             tvValor = itemView.findViewById(R.id.tvValor);
             tvDisponible = itemView.findViewById(R.id.tvDisponible);
             tvContratoVigente = itemView.findViewById(R.id.tvContratoVigente);

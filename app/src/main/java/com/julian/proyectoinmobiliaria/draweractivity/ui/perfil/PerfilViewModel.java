@@ -12,6 +12,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.julian.proyectoinmobiliaria.model.Propietario;
 import com.julian.proyectoinmobiliaria.service.ApiService;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -36,7 +37,10 @@ public class PerfilViewModel extends AndroidViewModel {
     public PerfilViewModel(@NonNull Application application) {
         super(application);
         // uso apiservice.getapiservice() para centralizar la instancia de retrofit y su interface. no creo la instancia manualmente aqui.
-        apiService = ApiService.getApiService();
+        SharedPreferences prefs = application.getSharedPreferences("token_prefs", Context.MODE_PRIVATE);
+        // Uso el cliente por defecto centralizado en ApiService
+        OkHttpClient client = ApiService.getDefaultClient();
+        apiService = ApiService.getApiService(client);
     }
 
     // aqui  los livedata para que el fragment observe

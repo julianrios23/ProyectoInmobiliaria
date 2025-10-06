@@ -46,16 +46,6 @@
             android:layout_height="wrap_content"
             android:text="Superficie: " />
 
-        <TextView android:id="@+id/tvLatitud"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Latitud: " />
-
-        <TextView android:id="@+id/tvLongitud"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Longitud: " />
-
         <TextView android:id="@+id/tvValor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

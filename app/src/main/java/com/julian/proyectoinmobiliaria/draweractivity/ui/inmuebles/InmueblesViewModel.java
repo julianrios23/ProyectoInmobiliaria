@@ -30,19 +30,9 @@ public class InmueblesViewModel extends AndroidViewModel {
         super(application);
         prefs = application.getSharedPreferences("token_prefs", Context.MODE_PRIVATE);
         // configuro el cliente okhttp para agregar el token en la cabecera de cada solicitud
-        OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(chain -> {
-                    Request original = chain.request();
-                    String token = prefs.getString("token", "");
-                    Request request = original.newBuilder()
-                            .header("Authorization", "Bearer " + token)
-                            .method(original.method(), original.body())
-                            .build();
-                    return chain.proceed(request);
-                })
-                .build();
-        // uso apiservice.getapiservice() para centralizar la instancia de retrofit y su interface. no creo la instancia manualmente aqui.
-        apiService = ApiService.getApiService();
+        // Uso el cliente por defecto centralizado en ApiService
+        OkHttpClient client = ApiService.getDefaultClient();
+        apiService = ApiService.getApiService(client);
     }
 
     // devuelvo el livedata que contiene la lista de inmuebles

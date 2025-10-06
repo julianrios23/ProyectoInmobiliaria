@@ -24,17 +24,17 @@
     <fragment
         android:id="@+id/inquilinosFragment"
         android:name="com.julian.proyectoinmobiliaria.draweractivity.ui.inquilinos.InquilinosFragment"
-        android:label="fragment_inquilinos"
+        android:label="Inquilinos"
         tools:layout="@layout/fragment_inquilinos" />
     <fragment
         android:id="@+id/contratosFragment"
         android:name="com.julian.proyectoinmobiliaria.draweractivity.ui.contratos.ContratosFragment"
-        android:label="fragment_contratos"
+        android:label="Contratos"
         tools:layout="@layout/fragment_contratos" />
     <fragment
         android:id="@+id/nav_logout"
         android:name="com.julian.proyectoinmobiliaria.draweractivity.ui.logout.LogoutFragment"
-        android:label="fragment_logout"
+        android:label="Salir"
         tools:layout="@layout/fragment_logout" />
 
 </navigation>
