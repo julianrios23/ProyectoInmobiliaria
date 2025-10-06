@@ -10,7 +10,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.julian.proyectoinmobiliaria.model.Inmueble;
-import com.julian.proyectoinmobiliaria.service.InmueblesApi;
+import com.julian.proyectoinmobiliaria.service.ApiService;
 
 import java.util.List;
 
@@ -19,12 +19,10 @@ import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class InmueblesViewModel extends AndroidViewModel {
     private final MutableLiveData<List<Inmueble>> inmueblesLiveData = new MutableLiveData<>();
-    private final InmueblesApi inmueblesApi;
+    private final ApiService.ServiceInterface apiService;
     private final SharedPreferences prefs;
 
     // inicializo el viewmodel y obtengo las preferencias compartidas para el token
@@ -43,13 +41,8 @@ public class InmueblesViewModel extends AndroidViewModel {
                     return chain.proceed(request);
                 })
                 .build();
-        // creo la instancia de retrofit usando la url base y el cliente configurado
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://inmobiliariaulp-amb5hwfqaraweyga.canadacentral-01.azurewebsites.net/")
-                .client(client)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        inmueblesApi = retrofit.create(InmueblesApi.class);
+        // uso apiservice.getapiservice() para centralizar la instancia de retrofit y su interface. no creo la instancia manualmente aqui.
+        apiService = ApiService.getApiService();
     }
 
     // devuelvo el livedata que contiene la lista de inmuebles
@@ -60,7 +53,7 @@ public class InmueblesViewModel extends AndroidViewModel {
     // defino el metodo para cargar los inmuebles desde la api
     public void cargarInmuebles() {
         String token = prefs.getString("token", "");
-        inmueblesApi.obtenerInmuebles("Bearer " + token).enqueue(new Callback<List<Inmueble>>() {
+        apiService.obtenerInmuebles("Bearer " + token).enqueue(new Callback<List<Inmueble>>() {
             @Override
             public void onResponse(Call<List<Inmueble>> call, Response<List<Inmueble>> response) {
                 // si la respuesta es exitosa y contiene datos, actualizo el livedata

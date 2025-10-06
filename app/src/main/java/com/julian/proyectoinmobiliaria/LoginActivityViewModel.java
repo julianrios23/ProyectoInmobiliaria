@@ -15,7 +15,8 @@ import androidx.lifecycle.MutableLiveData;
 
 
 import com.julian.proyectoinmobiliaria.draweractivity.DrawerActivity;
-import com.julian.proyectoinmobiliaria.service.LoginApi;
+import com.julian.proyectoinmobiliaria.service.ApiService;
+
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -37,7 +38,7 @@ public class LoginActivityViewModel extends AndroidViewModel {
     }
 
     // declaré la interfaz de la API y las preferencias compartidas.
-    private final LoginApi loginApi;
+    private final ApiService.ServiceInterface loginApi;
     private final SharedPreferences prefs;
 
     // inicialicé el ViewModel y configuré Retrofit con un interceptor para agregar headers y los convertidores necesarios.
@@ -60,18 +61,9 @@ public class LoginActivityViewModel extends AndroidViewModel {
                     return chain.proceed(request);
                 })
                 .build();
-        /*crea una instancia de retrofit configurando la url base de la api, el cliente http personalizado y dos convertidores:
-        uno para manejar respuestas como texto plano (scalars) y otro para manejar respuestas en formato json (gson).
-        luego genero la implementacion de la interfaz loginapi y obtengo las preferencias compartidas para guardar el token.*/
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://inmobiliariaulp-amb5hwfqaraweyga.canadacentral-01.azurewebsites.net/")
-                .client(client)
-                // ambos convertidores: Scalars para respuestas de texto plano y Gson para JSON
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        loginApi = retrofit.create(LoginApi.class);
+        // uso apiservice.getapiservice() para centralizar la instancia de retrofit y su interface. no creo la instancia manualmente aqui.
+        loginApi = ApiService.getApiService();
         prefs = application.getSharedPreferences("token_prefs", Context.MODE_PRIVATE);
     }
 

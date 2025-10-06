@@ -3,7 +3,6 @@ package com.julian.proyectoinmobiliaria.draweractivity.ui.perfil;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -11,12 +10,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.julian.proyectoinmobiliaria.model.Propietario;
+import com.julian.proyectoinmobiliaria.service.ApiService;
 
-import org.json.JSONObject;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 // aqui defino el viewmodel gestiona los datos del perfil y la logica de edicion
 public class PerfilViewModel extends AndroidViewModel {
@@ -30,9 +30,13 @@ public class PerfilViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> modoEdicion = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> mostrarToast = new MutableLiveData<>(false);
 
+    private ApiService.ServiceInterface apiService;
+
     // inicializo el viewmodel
     public PerfilViewModel(@NonNull Application application) {
         super(application);
+        // uso apiservice.getapiservice() para centralizar la instancia de retrofit y su interface. no creo la instancia manualmente aqui.
+        apiService = ApiService.getApiService();
     }
 
     // aqui  los livedata para que el fragment observe
@@ -54,137 +58,68 @@ public class PerfilViewModel extends AndroidViewModel {
 
     // inicio la carga de los datos del perfil desde la api
     public void cargarPerfil() {
-        new PerfilTask().execute();
-    }
-
-    // defino la tarea asincrona para obtener los datos del propietario desde la api
-    private class PerfilTask extends AsyncTask<Void, Void, Propietario> {
-        @Override
-        protected Propietario doInBackground(Void... voids) {
-            try {
-                SharedPreferences sp = getApplication().getSharedPreferences("token_prefs", Context.MODE_PRIVATE);
-                String token = sp.getString("token", "");
-                URL url = new URL("https://inmobiliariaulp-amb5hwfqaraweyga.canadacentral-01.azurewebsites.net/api/Propietarios");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-                conn.setRequestProperty("Authorization", "Bearer " + token);
-                conn.connect();
-                int responseCode = conn.getResponseCode();
-                if (responseCode == 200) {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                    StringBuilder sb = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        sb.append(line);
-                    }
-                    reader.close();
-                    JSONObject obj = new JSONObject(sb.toString());
-                    Propietario p = new Propietario();
-                    p.setIdPropietario(obj.getInt("idPropietario"));
-                    p.setNombre(obj.getString("nombre"));
-                    p.setApellido(obj.getString("apellido"));
-                    p.setDni(obj.getString("dni"));
-                    p.setTelefono(obj.getString("telefono"));
-                    p.setEmail(obj.getString("email"));
-                    p.setClave(obj.getString("clave"));
-                    return p;
+        SharedPreferences sp = getApplication().getSharedPreferences("token_prefs", Context.MODE_PRIVATE);
+        String token = sp.getString("token", "");
+        Call<Propietario> call = apiService.getPropietarios("Bearer " + token);
+        call.enqueue(new Callback<Propietario>() {
+            @Override
+            public void onResponse(Call<Propietario> call, Response<Propietario> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Propietario p = response.body();
+                    propietario.postValue(p);
+                    nombre.postValue(p.getNombre());
+                    apellido.postValue(p.getApellido());
+                    dni.postValue(p.getDni());
+                    telefono.postValue(p.getTelefono());
+                    email.postValue(p.getEmail());
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
-            return null;
-        }
-
-        // actualiz los livedata con los recibidos de la api
-        @Override
-        protected void onPostExecute(Propietario p) {
-            if (p != null) {
-                propietario.setValue(p);
-                nombre.setValue(p.getNombre());
-                apellido.setValue(p.getApellido());
-                dni.setValue(p.getDni());
-                telefono.setValue(p.getTelefono());
-                email.setValue(p.getEmail());
+            @Override
+            public void onFailure(Call<Propietario> call, Throwable t) {
+                t.printStackTrace();
             }
-        }
+        });
     }
 
     // guardo los datos editados del perfil si el modo edicion esta activo
     public void guardarPerfil() {
         if (modoEdicion.getValue() != null && modoEdicion.getValue()) {
-            new GuardarPerfilTask().execute(
-                nombre.getValue(),
-                apellido.getValue(),
-                dni.getValue(),
-                telefono.getValue(),
-                email.getValue()
-            );
-        }
-    }
-
-    // defino la tarea para enviar los datos editados a la api
-    private class GuardarPerfilTask extends AsyncTask<String, Void, Propietario> {
-        @Override
-        protected Propietario doInBackground(String... datos) {
-            try {
-                SharedPreferences sp = getApplication().getSharedPreferences("token_prefs", Context.MODE_PRIVATE);
-                String token = sp.getString("token", "");
-                URL url = new URL("https://inmobiliariaulp-amb5hwfqaraweyga.canadacentral-01.azurewebsites.net/api/Propietarios/actualizar");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("PUT");
-                conn.setRequestProperty("Authorization", "Bearer " + token);
-                conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                conn.setDoOutput(true);
-                JSONObject obj = new JSONObject();
-                obj.put("idPropietario", propietario.getValue() != null ? propietario.getValue().getIdPropietario() : 0);
-                obj.put("nombre", datos[0]);
-                obj.put("apellido", datos[1]);
-                obj.put("dni", datos[2]);
-                obj.put("telefono", datos[3]);
-                obj.put("email", datos[4]);
-                obj.put("clave", JSONObject.NULL); // clave siempre null
-                String json = obj.toString();
-                java.io.OutputStream os = conn.getOutputStream();
-                os.write(json.getBytes("UTF-8"));
-                os.close();
-                int responseCode = conn.getResponseCode();
-                if (responseCode == 200) {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                    StringBuilder sb = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        sb.append(line);
+            SharedPreferences sp = getApplication().getSharedPreferences("token_prefs", Context.MODE_PRIVATE);
+            String token = sp.getString("token", "");
+            Propietario p = new Propietario();
+            if (propietario.getValue() != null) {
+                p.setIdPropietario(propietario.getValue().getIdPropietario());
+                // siempre null al enviar a la api NO CAMBIAR LA CLAVE
+                p.setClave(null);
+            } else {
+                p.setClave(null);
+            }
+            p.setNombre(nombre.getValue());
+            p.setApellido(apellido.getValue());
+            p.setDni(dni.getValue());
+            p.setTelefono(telefono.getValue());
+            p.setEmail(email.getValue());
+            Call<Propietario> call = apiService.actualizarPropietario("Bearer " + token, p);
+            call.enqueue(new Callback<Propietario>() {
+                @Override
+                public void onResponse(Call<Propietario> call, Response<Propietario> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        Propietario actualizado = response.body();
+                        propietario.postValue(actualizado);
+                        nombre.postValue(actualizado.getNombre());
+                        apellido.postValue(actualizado.getApellido());
+                        dni.postValue(actualizado.getDni());
+                        telefono.postValue(actualizado.getTelefono());
+                        email.postValue(actualizado.getEmail());
+                        modoEdicion.postValue(false);
+                        mostrarToast.postValue(true);
                     }
-                    reader.close();
-                    JSONObject resp = new JSONObject(sb.toString());
-                    Propietario p = new Propietario();
-                    p.setIdPropietario(resp.getInt("idPropietario"));
-                    p.setNombre(resp.getString("nombre"));
-                    p.setApellido(resp.getString("apellido"));
-                    p.setDni(resp.getString("dni"));
-                    p.setTelefono(resp.getString("telefono"));
-                    p.setEmail(resp.getString("email"));
-                    p.setClave(resp.getString("clave"));
-                    return p;
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-        // actualizo los livedata y desactivo el modo edicion tras guardar
-        @Override
-        protected void onPostExecute(Propietario p) {
-            if (p != null) {
-                propietario.setValue(p);
-                nombre.setValue(p.getNombre());
-                apellido.setValue(p.getApellido());
-                dni.setValue(p.getDni());
-                telefono.setValue(p.getTelefono());
-                email.setValue(p.getEmail());
-                modoEdicion.setValue(false);
-                mostrarToast.setValue(true);
-            }
+                @Override
+                public void onFailure(Call<Propietario> call, Throwable t) {
+                    t.printStackTrace();
+                }
+            });
         }
     }
 
