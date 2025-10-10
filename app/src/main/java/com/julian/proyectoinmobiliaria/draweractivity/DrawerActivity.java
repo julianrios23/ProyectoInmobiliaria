@@ -3,6 +3,7 @@ package com.julian.proyectoinmobiliaria.draweractivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Menu;
+import android.util.Log;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
@@ -32,15 +33,8 @@ public class DrawerActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.appBarDrawer.toolbar);
-        binding.appBarDrawer.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null)
-                        .setAnchorView(binding.appBarDrawer.fab)
-                        .show();
-            }
-        });
+
+
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
         View headerView = navigationView.getHeaderView(0);
@@ -66,15 +60,22 @@ public class DrawerActivity extends AppCompatActivity {
         perfilViewModel.getEmail().observe(this, email -> {
             tvMail2.setText(email); // Muestra el email del usuario
         });
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+
+        // todos los destinos principales para mostrar el menu hamburguesa
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                binding.navView.getMenu().getItem(0).getItemId())
-                .setOpenableLayout(drawer)
-                .build();
+                R.id.nav_home,
+                R.id.nav_perfil,
+                R.id.nav_inmuebles,
+                R.id.inquilinosFragment,
+                R.id.contratosFragment,
+                R.id.nav_logout
+        )
+        .setOpenableLayout(drawer)
+        .build();
         // Usar el método tradicional con R para obtener el NavController, ya que binding no soporta fragments
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_drawer);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+        binding.appBarDrawer.toolbar.setNavigationIcon(R.drawable.menu);
         NavigationUI.setupWithNavController(navigationView, navController);
 
         navigationView.setNavigationItemSelectedListener(item -> {

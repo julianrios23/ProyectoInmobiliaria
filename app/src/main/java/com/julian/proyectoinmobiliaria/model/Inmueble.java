@@ -45,5 +45,7 @@ public class Inmueble {
     public void setDuenio(Propietario duenio) { this.duenio = duenio; }
     public boolean isTieneContratoVigente() { return tieneContratoVigente; }
     public void setTieneContratoVigente(boolean tieneContratoVigente) { this.tieneContratoVigente = tieneContratoVigente; }
+    public boolean isDisponible() {
+        return disponible != null && disponible;
+    }
 }
-

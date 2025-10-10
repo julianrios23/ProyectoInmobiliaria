@@ -25,7 +25,7 @@ public class InmueblesViewModel extends AndroidViewModel {
     private final ApiService.ServiceInterface apiService;
     private final SharedPreferences prefs;
 
-    // inicializo el viewmodel y obtengo las preferencias compartidas para el token
+    // en este bloque inicializo el viewmodel y obtengo las preferencias compartidas para el token
     public InmueblesViewModel(@NonNull Application application) {
         super(application);
         prefs = application.getSharedPreferences("token_prefs", Context.MODE_PRIVATE);
@@ -35,12 +35,12 @@ public class InmueblesViewModel extends AndroidViewModel {
         apiService = ApiService.getApiService(client);
     }
 
-    // devuelvo el livedata que contiene la lista de inmuebles
+    // en este bloque devuelvo el livedata que contiene la lista de inmuebles
     public LiveData<List<Inmueble>> getInmueblesLiveData() {
         return inmueblesLiveData;
     }
 
-    // defino el metodo para cargar los inmuebles desde la api
+    // en este bloque defino el metodo para cargar los inmuebles desde la api
     public void cargarInmuebles() {
         String token = prefs.getString("token", "");
         apiService.obtenerInmuebles("Bearer " + token).enqueue(new Callback<List<Inmueble>>() {

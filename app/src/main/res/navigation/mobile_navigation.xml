@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/nav_home"
         android:name="com.julian.proyectoinmobiliaria.draweractivity.ui.inicio.HomeFragment"
-        android:label="@string/menu_home"
+        android:label="Aqui estamos..."
         tools:layout="@layout/fragment_home" />
 
     <fragment
@@ -36,5 +36,10 @@
         android:name="com.julian.proyectoinmobiliaria.draweractivity.ui.logout.LogoutFragment"
         android:label="Salir"
         tools:layout="@layout/fragment_logout" />
+    <fragment
+        android:id="@+id/pagosFragment"
+        android:name="com.julian.proyectoinmobiliaria.draweractivity.ui.pagos.PagosFragment"
+        android:label="Pagos"
+        tools:layout="@layout/fragment_pagos" />
 
 </navigation>

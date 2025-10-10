@@ -1,5 +1,7 @@
 package com.julian.proyectoinmobiliaria.draweractivity.ui.inmuebles;
 
+import static com.julian.proyectoinmobiliaria.service.ApiService.BASE_URL;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.julian.proyectoinmobiliaria.R;
 import com.julian.proyectoinmobiliaria.model.Inmueble;
+import com.julian.proyectoinmobiliaria.util.ManejoImagenes;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -24,7 +27,7 @@ public class InmueblesAdapter extends RecyclerView.Adapter<InmueblesAdapter.Inmu
     }
 
     public void setInmuebles(List<Inmueble> inmuebles) {
-        Log.d("InmueblesAdapter", "setInmuebles: " + (inmuebles == null ? "null" : ("size=" + inmuebles.size())));
+        //Log.d("InmueblesAdapter", "setInmuebles: " + (inmuebles == null ? "null" : ("size=" + inmuebles.size())));
         this.inmuebles = inmuebles;
         notifyDataSetChanged();
     }
@@ -36,11 +39,12 @@ public class InmueblesAdapter extends RecyclerView.Adapter<InmueblesAdapter.Inmu
         return new InmuebleViewHolder(view);
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull InmuebleViewHolder holder, int position) {
         try {
             Inmueble inmueble = inmuebles.get(position);
-            Log.d("InmueblesAdapter", "onBindViewHolder: pos=" + position + ", inmueble=" + inmueble);
+
             holder.tvDireccion.setText("Dirección: " + inmueble.getDireccion());
             holder.tvUso.setText("Uso: " + inmueble.getUso());
             holder.tvTipo.setText("Tipo: " + inmueble.getTipo());
@@ -49,20 +53,22 @@ public class InmueblesAdapter extends RecyclerView.Adapter<InmueblesAdapter.Inmu
             holder.tvValor.setText("Valor: $" + inmueble.getValor());
             holder.tvDisponible.setText("Disponible: " + (inmueble.getDisponible() != null && inmueble.getDisponible() ? "Sí" : "No"));
             holder.tvContratoVigente.setText("Contrato vigente: " + (inmueble.isTieneContratoVigente() ? "Sí" : "No"));
+
             if (inmueble.getDuenio() != null) {
                 holder.tvDuenio.setText("Dueño: " + inmueble.getDuenio().getNombre() + " " + inmueble.getDuenio().getApellido());
             } else {
                 holder.tvDuenio.setText("Dueño: -");
             }
-            if (inmueble.getImagen() != null && !inmueble.getImagen().isEmpty()) {
-                Picasso.get().load(inmueble.getImagen().replace("\\", "/")).into(holder.ivImagen);
-            } else {
-                holder.ivImagen.setImageResource(R.drawable.home);
-            }
+
+            // carga de imagen
+            ManejoImagenes.loadImage(inmueble.getImagen(), holder.ivImagen, "InmueblesAdapter");
+
+
         } catch (Exception e) {
             Log.e("InmueblesAdapter", "Error en onBindViewHolder pos=" + position, e);
         }
     }
+
 
     @Override
     public int getItemCount() {

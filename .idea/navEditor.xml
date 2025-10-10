@@ -80,6 +80,18 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="pagosFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="142" />
+                            <option name="y" value="-59" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                 </map>
               </option>
             </LayoutPositions>

@@ -2,7 +2,9 @@ package com.julian.proyectoinmobiliaria.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.julian.proyectoinmobiliaria.model.Contrato;
 import com.julian.proyectoinmobiliaria.model.Inmueble;
+import com.julian.proyectoinmobiliaria.model.Pagos;
 import com.julian.proyectoinmobiliaria.model.Propietario;
 
 import java.util.List;
@@ -18,9 +20,10 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
+import retrofit2.http.Path;
 
 public class ApiService {
-    static String BASE_URL = "https://inmobiliariaulp-amb5hwfqaraweyga.canadacentral-01.azurewebsites.net/";
+    public static String BASE_URL = "https://inmobiliariaulp-amb5hwfqaraweyga.canadacentral-01.azurewebsites.net/";
 
 
     public static ServiceInterface getApiService(OkHttpClient client) {
@@ -66,6 +69,15 @@ public class ApiService {
 
         @PUT("api/Propietarios/actualizar")
         Call<Propietario> actualizarPropietario(@Header("Authorization") String token, @Body Propietario propietario);
+
+        @GET("api/Inmuebles/GetContratoVigente")
+        Call<List<Inmueble>> contratoVigente(@Header("Authorization") String token);
+
+        @GET("api/contratos/inmueble/{id}")
+        Call<Contrato> obtenerContratoPorInmueble(@Header("Authorization") String token, @Path("id") int idInmueble);
+
+        @GET("api/pagos/contrato/{id}")
+        Call<List<Pagos>> obtenerPagosPorContrato(@Header("Authorization") String token, @Path("id") int idContrato);
 
     }
 
