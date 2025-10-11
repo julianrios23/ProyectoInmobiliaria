@@ -30,6 +30,7 @@ public class PerfilViewModel extends AndroidViewModel {
     private final MutableLiveData<String> email = new MutableLiveData<>("");
     private final MutableLiveData<Boolean> modoEdicion = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> mostrarToast = new MutableLiveData<>(false);
+    private final MutableLiveData<String> mensajeToast = new MutableLiveData<>("");
 
     private ApiService.ServiceInterface apiService;
 
@@ -52,6 +53,7 @@ public class PerfilViewModel extends AndroidViewModel {
     public LiveData<String> getEmail() { return email; }
     public LiveData<Boolean> getModoEdicion() { return modoEdicion; }
     public LiveData<Boolean> getMostrarToast() { return mostrarToast; }
+    public LiveData<String> getMensajeToast() { return mensajeToast; }
 
     // cambio el modo edicion econ booleano
     public void toggleModoEdicion() {
@@ -117,6 +119,7 @@ public class PerfilViewModel extends AndroidViewModel {
                         email.postValue(actualizado.getEmail());
                         modoEdicion.postValue(false);
                         mostrarToast.postValue(true);
+                        mensajeToast.postValue("Perfil actualizado con éxito");
                     }
                 }
                 @Override

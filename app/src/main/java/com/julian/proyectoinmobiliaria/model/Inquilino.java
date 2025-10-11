@@ -7,5 +7,5 @@ public class Inquilino {
     public String dni;
     public String telefono;
     public String email;
+    public String direccionInmueble;
 }
-

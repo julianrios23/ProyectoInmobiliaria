@@ -45,14 +45,9 @@ public class ContratosFragment extends Fragment {
             ContratoVigenteAdapter adapter = new ContratoVigenteAdapter(lista != null ? lista : new ArrayList<>());
             rv.setAdapter(adapter);
         });
-        mViewModel.getEstadoUI().observe(getViewLifecycleOwner(), estado -> {
-            if (estado == ContratosViewModel.EstadoUI.MOSTRAR_LISTA) {
-                rv.setVisibility(View.VISIBLE);
-                view.findViewById(R.id.tvEmpty).setVisibility(View.GONE);
-            } else {
-                rv.setVisibility(View.GONE);
-                view.findViewById(R.id.tvEmpty).setVisibility(View.VISIBLE);
-            }
+        mViewModel.getUIState().observe(getViewLifecycleOwner(), uiState -> {
+            rv.setVisibility(uiState.rvVisibility);
+            view.findViewById(R.id.tvEmpty).setVisibility(uiState.tvEmptyVisibility);
         });
         mViewModel.cargarContratosVigentes();
     }

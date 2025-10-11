@@ -68,34 +68,7 @@ public class ContratoVigenteAdapter extends RecyclerView.Adapter<ContratoVigente
             // aqui uso el metodo loadImage para mostrar la imagen del inmueble
             ManejoImagenes.loadImage(contrato.inmueble.getImagen(), holder.ivImagen, "ContratoVigenteAdapter");
             // Manejo del click en btnPagos
-            holder.btnPagos.setOnClickListener(v -> {
-                SharedPreferences sp = v.getContext().getSharedPreferences("datos", Context.MODE_PRIVATE);
-                java.util.Map<String, ?> allPrefs = sp.getAll();
-                for (String key : allPrefs.keySet()) {
-                    Log.d("btnPagos", "sharedpreferences key: " + key + ", value: " + allPrefs.get(key));
-                }
-                String token = sp.getString("token", "");
-                if (token.isEmpty()) {
-                    token = sp.getString("Token", "");
-                }
-                if (token.isEmpty() && allPrefs.containsKey("token")) {
-                    token = String.valueOf(allPrefs.get("token"));
-                }
-                if (token.isEmpty() && allPrefs.containsKey("Token")) {
-                    token = String.valueOf(allPrefs.get("Token"));
-                }
-                Log.d("btnPagos", "token final usado: " + token);
-                Bundle bundle = new Bundle();
-                bundle.putInt("idContrato", contrato.idContrato);
-                bundle.putString("token", token);
-                Log.d("btnPagos", "navegando a pagosFragment con idContrato: " + contrato.idContrato + ", token: " + token);
-                try {
-                    Navigation.findNavController(v).navigate(R.id.pagosFragment, bundle);
-                    Log.d("btnPagos", "navegacion a pagosFragment exitosa");
-                } catch (Exception e) {
-                    Log.e("btnPagos", "error al navegar a pagosFragment: " + e.getMessage());
-                }
-            });
+            holder.btnPagos.setOnClickListener(null);
         } catch (Exception e) {
             Log.e("ContratoVigenteAdapter", "Error en onBindViewHolder: " + e.getMessage());
         }

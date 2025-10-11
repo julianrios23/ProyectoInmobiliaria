@@ -52,6 +52,29 @@ public class ContratosViewModel extends AndroidViewModel {
         return estadoUI;
     }
 
+    // Clase para representar el estado de visibilidad de la UI
+    public static class UIState {
+        public final int rvVisibility;
+        public final int tvEmptyVisibility;
+        public UIState(int rvVisibility, int tvEmptyVisibility) {
+            this.rvVisibility = rvVisibility;
+            this.tvEmptyVisibility = tvEmptyVisibility;
+        }
+    }
+    private final MutableLiveData<UIState> uiState = new MutableLiveData<>();
+    public LiveData<UIState> getUIState() {
+        return uiState;
+    }
+
+    // Actualiza el estado de la UI según el estado actual
+    private void actualizarUIState(EstadoUI estado) {
+        if (estado == EstadoUI.MOSTRAR_LISTA) {
+            uiState.postValue(new UIState(android.view.View.VISIBLE, android.view.View.GONE));
+        } else {
+            uiState.postValue(new UIState(android.view.View.GONE, android.view.View.VISIBLE));
+        }
+    }
+
     // defino el metodo para cargar los inmuebles vigentes desde la api
     public void cargarInmueblesVigentes() {
         String token = prefs.getString("token", "");
@@ -72,11 +95,13 @@ public class ContratosViewModel extends AndroidViewModel {
                     }
                     inmueblesVigentes.postValue(lista);
                     estadoUI.postValue(lista != null && !lista.isEmpty() ? EstadoUI.MOSTRAR_LISTA : EstadoUI.MOSTRAR_VACIO);
+                    actualizarUIState(lista != null && !lista.isEmpty() ? EstadoUI.MOSTRAR_LISTA : EstadoUI.MOSTRAR_VACIO);
                 } else {
                     // si no, actualizo el livedata con null y el estado de la interfaz como vacio
                     android.util.Log.d("CONTRATOS", "Respuesta no exitosa o body nulo");
                     inmueblesVigentes.postValue(null);
                     estadoUI.postValue(EstadoUI.MOSTRAR_VACIO);
+                    actualizarUIState(EstadoUI.MOSTRAR_VACIO);
                 }
             }
             @Override
@@ -85,6 +110,7 @@ public class ContratosViewModel extends AndroidViewModel {
                 android.util.Log.e("CONTRATOS", "Error al obtener inmuebles: " + t.getMessage(), t);
                 inmueblesVigentes.postValue(null);
                 estadoUI.postValue(EstadoUI.MOSTRAR_VACIO);
+                actualizarUIState(EstadoUI.MOSTRAR_VACIO);
             }
         });
     }
@@ -102,6 +128,7 @@ public class ContratosViewModel extends AndroidViewModel {
                     if (lista.isEmpty()) {
                         contratosVigentes.postValue(new ArrayList<>());
                         estadoUI.postValue(EstadoUI.MOSTRAR_VACIO);
+                        actualizarUIState(EstadoUI.MOSTRAR_VACIO);
                         return;
                     }
                     List<Contrato> contratos = new ArrayList<>();
@@ -118,6 +145,7 @@ public class ContratosViewModel extends AndroidViewModel {
                                 if (count[0] == total) {
                                     contratosVigentes.postValue(contratos);
                                     estadoUI.postValue(contratos.isEmpty() ? EstadoUI.MOSTRAR_VACIO : EstadoUI.MOSTRAR_LISTA);
+                                    actualizarUIState(contratos.isEmpty() ? EstadoUI.MOSTRAR_VACIO : EstadoUI.MOSTRAR_LISTA);
                                 }
                             }
                             @Override
@@ -126,6 +154,7 @@ public class ContratosViewModel extends AndroidViewModel {
                                 if (count[0] == total) {
                                     contratosVigentes.postValue(contratos);
                                     estadoUI.postValue(contratos.isEmpty() ? EstadoUI.MOSTRAR_VACIO : EstadoUI.MOSTRAR_LISTA);
+                                    actualizarUIState(contratos.isEmpty() ? EstadoUI.MOSTRAR_VACIO : EstadoUI.MOSTRAR_LISTA);
                                 }
                             }
                         });
@@ -133,12 +162,14 @@ public class ContratosViewModel extends AndroidViewModel {
                 } else {
                     contratosVigentes.postValue(new ArrayList<>());
                     estadoUI.postValue(EstadoUI.MOSTRAR_VACIO);
+                    actualizarUIState(EstadoUI.MOSTRAR_VACIO);
                 }
             }
             @Override
             public void onFailure(Call<List<Inmueble>> call, Throwable t) {
                 contratosVigentes.postValue(new ArrayList<>());
                 estadoUI.postValue(EstadoUI.MOSTRAR_VACIO);
+                actualizarUIState(EstadoUI.MOSTRAR_VACIO);
             }
         });
     }

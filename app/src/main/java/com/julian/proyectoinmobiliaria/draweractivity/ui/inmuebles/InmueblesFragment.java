@@ -49,7 +49,7 @@ public class InmueblesFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(InmueblesViewModel.class);
         mViewModel.getInmueblesLiveData().observe(getViewLifecycleOwner(), inmuebles -> {
-            Log.d("InmueblesFragment", "observer: inmuebles=" + (inmuebles == null ? "null" : ("size=" + inmuebles.size())));
+
             if (inmuebles != null) {
                 adapter.setInmuebles(inmuebles);
             }

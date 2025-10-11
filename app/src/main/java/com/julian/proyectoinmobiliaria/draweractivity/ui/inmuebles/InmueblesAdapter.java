@@ -27,7 +27,7 @@ public class InmueblesAdapter extends RecyclerView.Adapter<InmueblesAdapter.Inmu
     }
 
     public void setInmuebles(List<Inmueble> inmuebles) {
-        //Log.d("InmueblesAdapter", "setInmuebles: " + (inmuebles == null ? "null" : ("size=" + inmuebles.size())));
+
         this.inmuebles = inmuebles;
         notifyDataSetChanged();
     }

@@ -62,11 +62,8 @@ public class PerfilFragment extends Fragment {
             etTelefono.setEnabled(modoEdicion);
             btnEditarGuardar.setText(modoEdicion ? "Guardar" : "Editar");
         });
-        mViewModel.getMostrarToast().observe(getViewLifecycleOwner(), mostrar -> {
-            if (mostrar != null && mostrar) {
-                Toast.makeText(getContext(), "Datos guardados correctamente", Toast.LENGTH_SHORT).show();
-                mViewModel.toastMostrado();
-            }
+        mViewModel.getMensajeToast().observe(getViewLifecycleOwner(), mensaje -> {
+            Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
         });
         // aqui configuro el boton para camviar entre editar y guardar
         btnEditarGuardar.setOnClickListener(v -> {
