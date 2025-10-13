@@ -45,4 +45,22 @@ public class ManejoImagenes {
 
         }
     }
+
+    // Método para obtener la ruta real de un archivo desde un Uri
+    public static String getPathFromUri(android.content.Context context, android.net.Uri uri) {
+        String[] projection = { android.provider.MediaStore.Images.Media.DATA };
+        android.database.Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(uri, projection, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                int columnIndex = cursor.getColumnIndexOrThrow(android.provider.MediaStore.Images.Media.DATA);
+                return cursor.getString(columnIndex);
+            }
+        } catch (Exception e) {
+            Log.e("ManejoImagenes", "Error obteniendo path de Uri", e);
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+        return null;
+    }
 }

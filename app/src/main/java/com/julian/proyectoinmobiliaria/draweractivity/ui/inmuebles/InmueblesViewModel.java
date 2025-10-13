@@ -12,6 +12,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.julian.proyectoinmobiliaria.model.Inmueble;
 import com.julian.proyectoinmobiliaria.service.ApiService;
 
+import java.util.Collections;
 import java.util.List;
 
 import okhttp3.OkHttpClient;
@@ -48,9 +49,12 @@ public class InmueblesViewModel extends AndroidViewModel {
             public void onResponse(Call<List<Inmueble>> call, Response<List<Inmueble>> response) {
                 // si la respuesta es exitosa y contiene datos, actualizo el livedata
                 if (response.isSuccessful() && response.body() != null) {
-                    inmueblesLiveData.postValue(response.body());
+                    List<Inmueble> lista = response.body();
+                    // muestra el ultimo id primeero
+                    Collections.sort(lista, (a, b) -> Integer.compare(b.getIdInmueble(), a.getIdInmueble()));
+                    inmueblesLiveData.postValue(lista);
                 } else {
-                    // si no, lo actualizo con null
+                    // si no, lo actualizo con nulla
                     inmueblesLiveData.postValue(null);
                 }
             }

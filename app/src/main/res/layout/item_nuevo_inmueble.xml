@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/tvIdInmueble"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ID: "
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tvIdPropietario"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Propietario: "/>
+
+    <EditText
+        android:id="@+id/etDireccion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Dirección"/>
+
+    <EditText
+        android:id="@+id/etUso"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Uso"/>
+
+    <EditText
+        android:id="@+id/etTipo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tipo"/>
+
+    <EditText
+        android:id="@+id/etAmbientes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ambientes"
+        android:inputType="number"/>
+
+    <EditText
+        android:id="@+id/etSuperficie"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Superficie (m²)"
+        android:inputType="numberDecimal"/>
+
+    <EditText
+        android:id="@+id/etLatitud"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Latitud"
+        android:inputType="numberDecimal"/>
+
+    <EditText
+        android:id="@+id/etLongitud"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Longitud"
+        android:inputType="numberDecimal"/>
+
+    <EditText
+        android:id="@+id/etValor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Valor ($)"
+        android:inputType="numberDecimal"/>
+
+    <CheckBox
+        android:id="@+id/cbDisponible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Disponible"/>
+
+    <CheckBox
+        android:id="@+id/cbContrato"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Contrato vigente"
+        android:checked="false"/>
+
+    <ImageView
+        android:id="@+id/ivImagen"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:scaleType="centerCrop"
+        android:contentDescription="Imagen inmueble"/>
+
+</LinearLayout>

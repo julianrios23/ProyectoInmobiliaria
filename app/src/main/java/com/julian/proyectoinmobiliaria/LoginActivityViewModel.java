@@ -67,6 +67,20 @@ public class LoginActivityViewModel extends AndroidViewModel {
                 if (response.isSuccessful() && response.body() != null) {
                     String token = response.body();
                     prefs.edit().putString("token", token).putString("email", usuario).apply();
+                    // Obtener el propietario y guardar su id
+                    loginApi.getPropietarios("Bearer " + token).enqueue(new Callback<com.julian.proyectoinmobiliaria.model.Propietario>() {
+                        @Override
+                        public void onResponse(Call<com.julian.proyectoinmobiliaria.model.Propietario> call, Response<com.julian.proyectoinmobiliaria.model.Propietario> response) {
+                            if (response.isSuccessful() && response.body() != null) {
+                                int idPropietario = response.body().getIdPropietario();
+                                prefs.edit().putInt("idPropietario", idPropietario).apply();//para nuevo inmueble
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call<com.julian.proyectoinmobiliaria.model.Propietario> call, Throwable t) {
+                            // No hacer nada, el id no se guarda
+                        }
+                    });
                     String tokenGuardado = prefs.getString("token", "no_token");
                     Toast.makeText(context, "Login exitoso", Toast.LENGTH_SHORT).show();
                     loginResult.postValue("success");

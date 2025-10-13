@@ -20,5 +20,6 @@
     <string name="menu_inquilinos">Inquilinos</string>
     <string name="menu_contratos">Contratos</string>
     <string name="menu_logout">Logout</string>
-
+    <string name="label_id_inmueble">ID: %1$d</string>
+    <string name="label_id_propietario">Propietario: %1$d</string>
 </resources>

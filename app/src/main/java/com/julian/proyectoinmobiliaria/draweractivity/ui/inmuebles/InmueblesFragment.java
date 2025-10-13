@@ -41,20 +41,29 @@ public class InmueblesFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new InmueblesAdapter(new ArrayList<Inmueble>());
         recyclerView.setAdapter(adapter);
+        // Agrego el listener al FAB para mostrar NuevoInmuebleFragment
+        View fabAgregarInm = view.findViewById(R.id.fabAgregarInm);
+        fabAgregarInm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Mostrar el DialogFragment superpuesto y transparente
+                NuevoInmuebleFragment nuevoFragment = NuevoInmuebleFragment.newInstance();
+                nuevoFragment.show(requireActivity().getSupportFragmentManager(), "NuevoInmuebleDialog");
+            }
+        });
         return view;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(InmueblesViewModel.class);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        // Usar el ViewModel compartido de la Activity
+        mViewModel = new ViewModelProvider(requireActivity()).get(InmueblesViewModel.class);
         mViewModel.getInmueblesLiveData().observe(getViewLifecycleOwner(), inmuebles -> {
-
-            if (inmuebles != null) {
-                adapter.setInmuebles(inmuebles);
-            }
+            adapter.setInmuebles(inmuebles);
+            adapter.notifyDataSetChanged();
         });
-        mViewModel.cargarInmuebles();
+        mViewModel.cargarInmuebles(); // Carga inicial
     }
 
 }

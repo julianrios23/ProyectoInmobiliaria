@@ -6,7 +6,7 @@ public class Inmueble {
     private String uso;
     private String tipo;
     private int ambientes;
-    private double superficie;
+    private int superficie;
     private double latitud;
     private double valor;
     private String imagen;
@@ -28,8 +28,8 @@ public class Inmueble {
     public void setTipo(String tipo) { this.tipo = tipo; }
     public int getAmbientes() { return ambientes; }
     public void setAmbientes(int ambientes) { this.ambientes = ambientes; }
-    public double getSuperficie() { return superficie; }
-    public void setSuperficie(double superficie) { this.superficie = superficie; }
+    public int getSuperficie() { return superficie; }
+    public void setSuperficie(int superficie) { this.superficie = superficie; }
     public double getLatitud() { return latitud; }
     public void setLatitud(double latitud) { this.latitud = latitud; }
     public double getValor() { return valor; }
