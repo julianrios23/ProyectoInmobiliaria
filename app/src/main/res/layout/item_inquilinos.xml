@@ -4,13 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
+    android:foreground="@drawable/edittext_olive_border"
+    card_view:cardBackgroundColor="#99BD70"
     card_view:cardCornerRadius="8dp"
-    card_view:cardElevation="4dp"
-    android:foreground="@drawable/edittext_olive_border">
+    card_view:cardElevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#BD8181"
         android:orientation="vertical"
         android:padding="12dp">
 
@@ -18,30 +20,30 @@
             android:id="@+id/tvNombreApellido"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
+            android:textColor="@android:color/black"
             android:textSize="18sp"
-            android:textColor="@android:color/black" />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvDni"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="@android:color/black" />
+            android:textColor="@android:color/black"
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/tvTelefono"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="@android:color/black" />
+            android:textColor="@android:color/black"
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/tvEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="@android:color/black" />
+            android:textColor="@android:color/black"
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/tvInmueble"
@@ -52,7 +54,8 @@
             android:text="Inmueble: "
             android:textColor="@color/black"
             android:textSize="16sp"
-            android:textStyle="italic" />
+            android:textStyle="italic"
+            android:typeface="normal" />
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

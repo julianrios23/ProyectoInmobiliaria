@@ -30,7 +30,11 @@
         android:id="@+id/contratosFragment"
         android:name="com.julian.proyectoinmobiliaria.draweractivity.ui.contratos.ContratosFragment"
         android:label="Contratos"
-        tools:layout="@layout/fragment_contratos" />
+        tools:layout="@layout/fragment_contratos" >
+        <action
+            android:id="@+id/action_contratosFragment_to_pagosFragment"
+            app:destination="@id/pagosFragment" />
+    </fragment>
     <fragment
         android:id="@+id/nav_logout"
         android:name="com.julian.proyectoinmobiliaria.draweractivity.ui.logout.LogoutFragment"
@@ -40,6 +44,10 @@
         android:id="@+id/pagosFragment"
         android:name="com.julian.proyectoinmobiliaria.draweractivity.ui.pagos.PagosFragment"
         android:label="Pagos"
-        tools:layout="@layout/fragment_pagos" />
+        tools:layout="@layout/fragment_pagos" >
+        <argument
+            android:name="idContrato"
+            app:argType="integer" />
+    </fragment>
 
 </navigation>

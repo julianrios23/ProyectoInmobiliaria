@@ -67,10 +67,14 @@ public class ContratoVigenteAdapter extends RecyclerView.Adapter<ContratoVigente
             holder.tvInquilino.setText("Inquilino: " + contrato.inquilino.nombre + " " + contrato.inquilino.apellido);
             // aqui uso el metodo loadImage para mostrar la imagen del inmueble
             ManejoImagenes.loadImage(contrato.inmueble.getImagen(), holder.ivImagen, "ContratoVigenteAdapter");
-            // Manejo del click en btnPagos
-            holder.btnPagos.setOnClickListener(null);
+            // Navegación al fragmento de pagos
+            holder.btnPagos.setOnClickListener(v -> {
+                Bundle bundle = new Bundle();
+                bundle.putInt("idContrato", contrato.idContrato);
+                Navigation.findNavController(v).navigate(R.id.action_contratosFragment_to_pagosFragment, bundle);
+            });
         } catch (Exception e) {
-            Log.e("ContratoVigenteAdapter", "Error en onBindViewHolder: " + e.getMessage());
+            Log.e("ContratoVigenteAdapter", "Error al mostrar contrato: " + e.getMessage());
         }
     }
 
