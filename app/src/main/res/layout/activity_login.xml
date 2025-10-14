@@ -21,21 +21,22 @@
 
     <TextView
         android:id="@+id/textView2"
-        android:layout_width="219dp"
-        android:layout_height="27dp"
+        android:layout_width="231dp"
+        android:layout_height="43dp"
         android:layout_marginTop="304dp"
         android:fontFamily="sans-serif-medium"
-        android:text="San Martin 988 - San Luis"
+        android:text="Junin 812 - San Luis"
         android:textAlignment="center"
         android:textColor="@color/olive_light"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView3"
-        android:layout_width="82dp"
-        android:layout_height="40dp"
+        android:layout_width="129dp"
+        android:layout_height="41dp"
         android:layout_marginTop="356dp"
         android:fontFamily="sans-serif-black"
         android:text="Login"

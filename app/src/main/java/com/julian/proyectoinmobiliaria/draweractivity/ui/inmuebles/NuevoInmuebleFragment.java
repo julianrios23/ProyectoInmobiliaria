@@ -5,6 +5,8 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -84,6 +86,7 @@ public class NuevoInmuebleFragment extends DialogFragment {
 
         // cuando el usuario toca el boton de guardar, voy guardando los datos y los paso al viewmodel
         btnGuardar.setOnClickListener(v -> {
+            // Recoger los datos de los campos
             String direccion = etDireccion.getText().toString();
             String uso = etUso.getText().toString();
             String tipo = etTipo.getText().toString();
@@ -94,11 +97,30 @@ public class NuevoInmuebleFragment extends DialogFragment {
             String valor = etValor.getText().toString();
             boolean disponible = cbDisponible.isChecked();
             boolean contratoVigente = cbContrato.isChecked();
-            mViewModel.procesarNuevoInmueble(
-                direccion, uso, tipo, ambientes, superficie, latitud, longitud, valor,
-                disponible, contratoVigente, imagenUri, getContext(),
-                () -> mInmueblesViewModel.cargarInmuebles() // recarga la lista solo tras exito
-            );
+
+            // dialogo de confirmacin
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Confirmar Guardado")
+                    .setMessage("¿Está seguro de querer guardar este nuevo inmueble?")
+                    .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Si el usuario confirma, llamar al ViewModel para procesar
+                            mViewModel.procesarNuevoInmueble(
+                                direccion, uso, tipo, ambientes, superficie, latitud, longitud, valor,
+                                disponible, contratoVigente, imagenUri, getContext(),
+                                () -> mInmueblesViewModel.cargarInmuebles() // recarga la lista solo tras exito
+                            );
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Si el usuario cancela, simplemente cerrar el diálogo
+                            dialog.dismiss();
+                        }
+                    })
+                    .show();
         });
         // observo el resultado del viewmodel y muestro un mensaje segun corresponda
         mViewModel.getResultadoLiveData().observe(getViewLifecycleOwner(), result -> {

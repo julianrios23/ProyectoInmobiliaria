@@ -45,18 +45,19 @@ public class HomeViewModel extends AndroidViewModel {
     // aqui defino el callback que se ejecuta cuando el mapa esta listo
     public class MapaActual implements OnMapReadyCallback {
         // aqui defino la ubicacion de la inmobiliaria
-        LatLng INMOBILIARIA = new LatLng(-33.29902475950794, -66.33835445915435);
+        LatLng INMOBILIARIA = new LatLng(-33.30102562782761, -66.33485401397176);
+
 
         // aqui configuro el mapa cuando esta listo
         @Override
         public void onMapReady(@NonNull GoogleMap googleMap) {
-            googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-            googleMap.addMarker(new MarkerOptions().position(INMOBILIARIA).title("Inmobiliaria Julian Rios"));
+            googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+            googleMap.addMarker(new MarkerOptions().position(INMOBILIARIA).title("Inmobiliaria Rios"));
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(INMOBILIARIA)
-                    .zoom(19)
+                    .zoom(20)
                     .bearing(10)
-                    .tilt(50)
+                    .tilt(60)
                     .build();
             CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
             googleMap.animateCamera(cameraUpdate);
