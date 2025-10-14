@@ -43,4 +43,20 @@ Trabajo Final Dispositivos Móviles
 *   `Pago.java`: Representa el modelo de datos para los pagos de los contratos vigentes.
 *   `Propietario.java`: Representa el modelo de datos para el propietario.
 
-En resumen, "ProyectoInmobiliaria" es una robusta aplicación de gestión inmobiliaria con una navegación clara y modular, diseñada para gestionar eficientemente los aspectos clave de las propiedades, inquilinos y contratos.
+**Requerimientos Solicitados:**
+
+* Login/logout de propietarios
+* Ver y editar su perfil
+* Listar sus inmuebles
+* Habilitar/Deshabilitar un inmueble de este propietario
+* Agregar un nuevo inmueble con foto y por defecto deshabilitado
+* Listar contratos por Inmuebles y sus pagos
+* NOTA: La aplicación no debe enviar el id del propietario. Este debe ser recuperado a través del token.
+  Todas las funcionalidades, salvo el Login, deben requerir estar autenticado.
+
+**Objetivos:**
+
+* Todos los objetivos se pueden considerar cumplidos. En cuanto a la NOTA, la aplicación utiliza correctamente un token de Authorization para la mayoría de las llamadas a la API, lo que implica que el ID del propietario se recupera en el lado del servidor a través del token, en lugar de ser enviado explícitamente desde el cliente. No se observa ningún idPropietario u ownerId enviado directamente en los cuerpos de las solicitudes (@Body o @Part).
+* Autenticación requerida para la mayoría de las funcionalidades: Todas las funcionalidades, excepto el método loginForm, requieren explícitamente un encabezado Authorization. Esto satisface el requisito de que todas las funcionalidades (excepto el inicio de sesión) requieren autenticación.
+
+  Este proyecto es una robusta aplicación de gestión inmobiliaria con una navegación clara y modular, diseñada para gestionar eficientemente los aspectos clave de las propiedades, inquilinos y contratos.
