@@ -56,7 +56,7 @@ Trabajo Final Dispositivos Móviles
 
 **Objetivos:**
 
-* Todos los objetivos se pueden considerar cumplidos. En cuanto a la NOTA, la aplicación utiliza correctamente un token de Authorization para la mayoría de las llamadas a la API, lo que implica que el ID del propietario se recupera en el lado del servidor a través del token, en lugar de ser enviado explícitamente desde el cliente. No se observa ningún idPropietario u ownerId enviado directamente en los cuerpos de las solicitudes (@Body o @Part).
+* Todos los objetivos se pueden considerar cumplidos. En cuanto a la NOTA, la aplicación utiliza correctamente un token de Authorization para la mayoría de las llamadas a la API, lo que implica que el ID del propietario se recupera en el lado del servidor a través del token, en lugar de ser enviado explícitamente desde el cliente. No se hay ningún idPropietario enviado directamente en los cuerpos de las solicitudes (@Body o @Part).
 * Autenticación requerida para la mayoría de las funcionalidades: Todas las funcionalidades, excepto el método loginForm, requieren explícitamente un encabezado Authorization. Esto satisface el requisito de que todas las funcionalidades (excepto el inicio de sesión) requieren autenticación.
 
   Este proyecto es una robusta aplicación de gestión inmobiliaria con una navegación clara y modular, diseñada para gestionar eficientemente los aspectos clave de las propiedades, inquilinos y contratos.
