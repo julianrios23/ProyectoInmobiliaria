@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.julian.proyectoinmobiliaria.R;
@@ -21,9 +22,20 @@ import java.util.List;
 
 public class InmueblesAdapter extends RecyclerView.Adapter<InmueblesAdapter.InmuebleViewHolder> {
     private List<Inmueble> inmuebles;
+    private OnEditarClickListener editarClickListener;
+    private final Fragment fragment;
 
-    public InmueblesAdapter(List<Inmueble> inmuebles) {
+    public interface OnEditarClickListener {
+        void onEditarClick(Inmueble inmueble);
+    }
+
+    public InmueblesAdapter(List<Inmueble> inmuebles, Fragment fragment) {
         this.inmuebles = inmuebles;
+        this.fragment = fragment;
+    }
+
+    public void setOnEditarClickListener(OnEditarClickListener listener) {
+        this.editarClickListener = listener;
     }
 
     public void setInmuebles(List<Inmueble> inmuebles) {
@@ -43,8 +55,8 @@ public class InmueblesAdapter extends RecyclerView.Adapter<InmueblesAdapter.Inmu
     @Override
     public void onBindViewHolder(@NonNull InmuebleViewHolder holder, int position) {
         try {
+            // Usar 'inmueble' solo para poblar la vista
             Inmueble inmueble = inmuebles.get(position);
-
             holder.tvDireccion.setText("Dirección: " + inmueble.getDireccion());
             holder.tvUso.setText("Uso: " + inmueble.getUso());
             holder.tvTipo.setText("Tipo: " + inmueble.getTipo());
@@ -63,7 +75,22 @@ public class InmueblesAdapter extends RecyclerView.Adapter<InmueblesAdapter.Inmu
             // carga de imagen
             ManejoImagenes.loadImage(inmueble.getImagen(), holder.ivImagen, "InmueblesAdapter");
 
-
+            // Listener para el botón Editar
+            holder.btnEditar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        int adapterPosition = holder.getAdapterPosition();
+                        if (adapterPosition != RecyclerView.NO_POSITION) {
+                            Inmueble inmuebleActual = inmuebles.get(adapterPosition);
+                            EditarInmuebleDialogFragment dialog = EditarInmuebleDialogFragment.newInstance(inmuebleActual);
+                            dialog.show(fragment.getParentFragmentManager(), "EditarInmuebleDialog");
+                        }
+                    } catch (Exception ex) {
+                        Log.e("InmueblesAdapter", "Error al abrir el dialog de edición", ex);
+                    }
+                }
+            });
         } catch (Exception e) {
             Log.e("InmueblesAdapter", "Error en onBindViewHolder pos=" + position, e);
         }
@@ -78,6 +105,7 @@ public class InmueblesAdapter extends RecyclerView.Adapter<InmueblesAdapter.Inmu
     static class InmuebleViewHolder extends RecyclerView.ViewHolder {
         TextView tvDireccion, tvUso, tvTipo, tvAmbientes, tvSuperficie, tvValor, tvDisponible, tvContratoVigente, tvDuenio;
         ImageView ivImagen;
+        View btnEditar;
         public InmuebleViewHolder(@NonNull View itemView) {
             super(itemView);
             tvDireccion = itemView.findViewById(R.id.tvDireccion);
@@ -90,6 +118,7 @@ public class InmueblesAdapter extends RecyclerView.Adapter<InmueblesAdapter.Inmu
             tvContratoVigente = itemView.findViewById(R.id.tvContratoVigente);
             tvDuenio = itemView.findViewById(R.id.tvDuenio);
             ivImagen = itemView.findViewById(R.id.ivImagen);
+            btnEditar = itemView.findViewById(R.id.btnEditar);
         }
     }
 }

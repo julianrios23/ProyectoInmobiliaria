@@ -95,7 +95,7 @@ public class PerfilViewModel extends AndroidViewModel {
             Propietario p = new Propietario();
             if (propietario.getValue() != null) {
                 p.setIdPropietario(propietario.getValue().getIdPropietario());
-                // siempre null al enviar a la api NO CAMBIAR LA CLAVE
+                // siempre null al enviar a la api NO CAMBIAR LA CLAVE!!!!!!!!!!!!
                 p.setClave(null);
             } else {
                 p.setClave(null);

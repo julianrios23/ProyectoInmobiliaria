@@ -4,7 +4,10 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
-    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -15,9 +18,14 @@
         android:roundIcon="@drawable/cliente"
         android:supportsRtl="true"
         android:theme="@style/Theme.ProyectoInmobiliaria">
+        <activity
+            android:name=".draweractivity.ui.inmuebles.EditarInmueble"
+            android:exported="false" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAutAZGhPMGbVEYecChy2efQ0t88U4rF-c"/>
+            android:value="AIzaSyAutAZGhPMGbVEYecChy2efQ0t88U4rF-c" />
+
         <activity
             android:name=".draweractivity.DrawerActivity"
             android:exported="false"

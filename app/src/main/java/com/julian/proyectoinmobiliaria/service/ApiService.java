@@ -93,6 +93,9 @@ public class ApiService {
             @Part MultipartBody.Part imagen,
             @Part("inmueble") RequestBody inmuebleJson
         );
+
+        @PUT("api/Inmuebles/actualizar")
+        Call<Inmueble> actualizarInmueble(@Header("Authorization") String token, @Body Inmueble inmueble);
     }
 
 }

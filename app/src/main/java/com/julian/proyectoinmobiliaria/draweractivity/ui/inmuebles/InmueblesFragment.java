@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
 import com.julian.proyectoinmobiliaria.R;
 import com.julian.proyectoinmobiliaria.model.Inmueble;
 
@@ -39,8 +40,16 @@ public class InmueblesFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_inmuebles, container, false);
         recyclerView = view.findViewById(R.id.recyclerInmuebles);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new InmueblesAdapter(new ArrayList<Inmueble>());
+        adapter = new InmueblesAdapter(new ArrayList<Inmueble>(), this);
         recyclerView.setAdapter(adapter);
+        // Listener para editar inmueble
+        adapter.setOnEditarClickListener(new InmueblesAdapter.OnEditarClickListener() {
+            @Override
+            public void onEditarClick(Inmueble inmueble) {
+                EditarInmuebleDialogFragment dialog = EditarInmuebleDialogFragment.newInstance(inmueble);
+                dialog.show(requireActivity().getSupportFragmentManager(), "EditarInmuebleDialog");
+            }
+        });
         // Agrego el listener al FAB para mostrar NuevoInmuebleFragment
         View fabAgregarInm = view.findViewById(R.id.fabAgregarInm);
         fabAgregarInm.setOnClickListener(new View.OnClickListener() {

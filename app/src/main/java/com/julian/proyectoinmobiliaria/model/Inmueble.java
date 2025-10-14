@@ -15,7 +15,7 @@ public class Inmueble {
     private int idPropietario;
     private Propietario duenio;
     private boolean tieneContratoVigente;
-    private Contrato contrato; // Added missing Contrato field
+    private Contrato contrato;
 
     // Getters y setters
     public int getIdInmueble() { return idInmueble; }
@@ -47,8 +47,9 @@ public class Inmueble {
     public boolean isTieneContratoVigente() { return tieneContratoVigente; }
     public void setTieneContratoVigente(boolean tieneContratoVigente) { this.tieneContratoVigente = tieneContratoVigente; }
     public Contrato getContrato() { return contrato; } // Getter for contrato
-    public void setContrato(Contrato contrato) { this.contrato = contrato; } // Setter for contrato
+    public void setContrato(Contrato contrato) { this.contrato = contrato; } // set x contrato
     public boolean isDisponible() {
         return disponible != null && disponible;
     }
 }
+

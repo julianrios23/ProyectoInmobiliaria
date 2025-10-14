@@ -88,14 +88,15 @@
                 android:id="@+id/cbDisponible"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Disponible"/>
+                android:text="Disponible" />
 
             <CheckBox
                 android:id="@+id/cbContrato"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Contrato vigente"
-                android:checked="false"/>
+                android:checked="false"
+                android:visibility="gone"/>
 
             <Button
                 android:id="@+id/btnGuardar"
