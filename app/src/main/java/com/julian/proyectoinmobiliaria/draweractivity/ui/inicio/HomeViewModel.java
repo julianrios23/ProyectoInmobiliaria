@@ -26,7 +26,7 @@ public class HomeViewModel extends AndroidViewModel {
     public HomeViewModel(Application application) {
         super(application);
         mText = new MutableLiveData<>();
-        mText.setValue("Inicio");
+        mText.postValue("Inicio");
     }
 
     // aqui expongo el livedata para que la vista lo observe
@@ -34,7 +34,7 @@ public class HomeViewModel extends AndroidViewModel {
         return mText;
     }
 
-    // aqui implemento la logica para cargar el mapa y pasarle el callback
+    // aqui implemento la logica para cargar el mapa
     public void cargarMapa(SupportMapFragment mapFragment) {
         if (mapFragment != null) {
             MapaActual mapaActual = new MapaActual();

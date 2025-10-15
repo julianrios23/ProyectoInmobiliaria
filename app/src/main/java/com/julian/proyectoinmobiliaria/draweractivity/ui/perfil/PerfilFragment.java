@@ -1,5 +1,6 @@
 package com.julian.proyectoinmobiliaria.draweractivity.ui.perfil;
 
+// este es el paquete donde se encuentra mi fragmento de perfil
 
 import androidx.lifecycle.ViewModelProvider;
 import android.os.Bundle;
@@ -15,62 +16,77 @@ import android.widget.Button;
 import android.widget.Toast;
 import androidx.lifecycle.Observer;
 import com.julian.proyectoinmobiliaria.R;
+import com.julian.proyectoinmobiliaria.databinding.FragmentPerfilBinding; // importo la clase de binding que android genero para mi layout
 import com.julian.proyectoinmobiliaria.model.Propietario;
 
-// aqui defino el fragment de perfil donde muestro y edito los datos del usuario
+
 public class PerfilFragment extends Fragment {
 
-    // aqui declaro las variables para los componentes de la interfaz y el viewmodel
-    private PerfilViewModel mViewModel;
-    private EditText etNombre, etApellido, etDni, etTelefono;
-    private TextView tvEmail;
-    private Button btnEditarGuardar;
+    private PerfilViewModel mViewModel; // aqui declaro mi viewmodel de perfil
+    private FragmentPerfilBinding binding; // aqui declaro mi variable de binding para acceder a las vistas
 
     // aqui creo una instancia nueva del fragment
     public static PerfilFragment newInstance() {
         return new PerfilFragment();
     }
 
-    // aqui inflo la vista y obtengo referencias a los componentes
+    // aqui inflo la vista usando view binding y obtengo referencias a los componentes
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_perfil, container, false);
-        etNombre = view.findViewById(R.id.etNombre);
-        etApellido = view.findViewById(R.id.etApellido);
-        etDni = view.findViewById(R.id.etDni);
-        etTelefono = view.findViewById(R.id.etTelefono);
-        tvEmail = view.findViewById(R.id.tvEmail);
-        btnEditarGuardar = view.findViewById(R.id.btnEditarGuardar);
-        return view;
+        binding = FragmentPerfilBinding.inflate(inflater, container, false); // inflo el layout usando el binding
+        View root = binding.getRoot(); // obtengo la vista raiz
+        return root; // devuelvo la vista raiz
     }
 
-    // aqui inicializo el viewmodel y configuro los observer
+    // aqui inicializo el viewmodel y configuro los observadores
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(PerfilViewModel.class);
-        mViewModel.getNombre().observe(getViewLifecycleOwner(), nombre -> etNombre.setText(nombre));
-        mViewModel.getApellido().observe(getViewLifecycleOwner(), apellido -> etApellido.setText(apellido));
-        mViewModel.getDni().observe(getViewLifecycleOwner(), dni -> etDni.setText(dni));
-        mViewModel.getTelefono().observe(getViewLifecycleOwner(), telefono -> etTelefono.setText(telefono));
-        mViewModel.getEmail().observe(getViewLifecycleOwner(), email -> tvEmail.setText(email));
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mViewModel = new ViewModelProvider(this).get(PerfilViewModel.class); // inicializo mi viewmodel
+        
+        // observo el nombre del viewmodel y lo muestro en el edittext
+        mViewModel.getNombre().observe(getViewLifecycleOwner(), nombre -> binding.etNombre.setText(nombre));
+        // observo el apellido del viewmodel y lo muestro en el edittext
+        mViewModel.getApellido().observe(getViewLifecycleOwner(), apellido -> binding.etApellido.setText(apellido));
+        // observo el dni del viewmodel y lo muestro en el edittext
+        mViewModel.getDni().observe(getViewLifecycleOwner(), dni -> binding.etDni.setText(dni));
+        // observo el telefono del viewmodel y lo muestro en el edittext
+        mViewModel.getTelefono().observe(getViewLifecycleOwner(), telefono -> binding.etTelefono.setText(telefono));
+        // observo el email del viewmodel y lo muestro en el textview
+        mViewModel.getEmail().observe(getViewLifecycleOwner(), email -> binding.tvEmail.setText(email));
+        
+        // observo el modo edicion del viewmodel para habilitar/deshabilitar campos y cambiar el texto del boton
         mViewModel.getModoEdicion().observe(getViewLifecycleOwner(), modoEdicion -> {
-            etNombre.setEnabled(modoEdicion);
-            etApellido.setEnabled(modoEdicion);
-            etDni.setEnabled(modoEdicion);
-            etTelefono.setEnabled(modoEdicion);
-            btnEditarGuardar.setText(modoEdicion ? "Guardar" : "Editar");
+            binding.etNombre.setEnabled(modoEdicion);
+            binding.etApellido.setEnabled(modoEdicion);
+            binding.etDni.setEnabled(modoEdicion);
+            binding.etTelefono.setEnabled(modoEdicion);
+            binding.btnEditarGuardar.setText(modoEdicion ? "guardar" : "editar"); // cambio el texto del boton
         });
+        
+        // observo los mensajes toast del viewmodel para mostrarlos en pantalla
         mViewModel.getMensajeToast().observe(getViewLifecycleOwner(), mensaje -> {
             Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
         });
-        // aqui configuro el boton para camviar entre editar y guardar
-        btnEditarGuardar.setOnClickListener(v -> {
-            mViewModel.onBotonEditarGuardar(etNombre.getText().toString(), etApellido.getText().toString(), etDni.getText().toString(), etTelefono.getText().toString());
+        
+        // aqui configuro el listener del boton para cambiar entre editar y guardar
+        binding.btnEditarGuardar.setOnClickListener(v -> {
+            // cuando se hace click, llamo al viewmodel con los datos actuales de los campos
+            mViewModel.onBotonEditarGuardar(binding.etNombre.getText().toString(),
+                                            binding.etApellido.getText().toString(),
+                                            binding.etDni.getText().toString(),
+                                            binding.etTelefono.getText().toString());
         });
-        // aqui cargo los datos del perfil
+        
+        // aqui cargo los datos iniciales del perfil desde el viewmodel
         mViewModel.cargarPerfil();
     }
 
+    @Override
+    // este metodo se llama cuando la vista del fragment se destruye
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null; // libero la referencia del binding
+    }
 }
