@@ -1,6 +1,6 @@
 package com.julian.proyectoinmobiliaria.draweractivity.ui.perfil;
 
-// este es el paquete donde se encuentra mi fragmento de perfil
+// yo implemento las validaciones y filtros en este fragment
 
 import androidx.lifecycle.ViewModelProvider;
 import android.os.Bundle;
@@ -9,15 +9,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Button;
 import android.widget.Toast;
-import androidx.lifecycle.Observer;
-import com.julian.proyectoinmobiliaria.R;
 import com.julian.proyectoinmobiliaria.databinding.FragmentPerfilBinding; // importo la clase de binding que android genero para mi layout
-import com.julian.proyectoinmobiliaria.model.Propietario;
+import android.text.InputFilter;
+import android.text.InputType;
 
 
 public class PerfilFragment extends Fragment {
@@ -64,12 +59,23 @@ public class PerfilFragment extends Fragment {
             binding.etTelefono.setEnabled(modoEdicion);
             binding.btnEditarGuardar.setText(modoEdicion ? "guardar" : "editar"); // cambio el texto del boton
         });
-        
-        // observo los mensajes toast del viewmodel para mostrarlos en pantalla
-        mViewModel.getMensajeToast().observe(getViewLifecycleOwner(), mensaje -> {
+
+        // observo los errores de validacion ya procesados y los muestro directamente
+        mViewModel.getErrorNombreFinal().observe(getViewLifecycleOwner(), error -> binding.etNombre.setError(error));
+        mViewModel.getErrorApellidoFinal().observe(getViewLifecycleOwner(), error -> binding.etApellido.setError(error));
+        mViewModel.getErrorDniFinal().observe(getViewLifecycleOwner(), error -> binding.etDni.setError(error));
+        // observo el toast ya procesado y lo muestro directamente
+        mViewModel.getToastFinal().observe(getViewLifecycleOwner(), mensaje -> {
             Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
+            mViewModel.toastMostrado();
         });
-        
+
+        // aplico filtros de entrada para mejorar la experiencia (nombre/apellido solo letras, dni solo digitos)
+        binding.etNombre.setFilters(new InputFilter[]{ InputFilters.LETTERS_FILTER });
+        binding.etApellido.setFilters(new InputFilter[]{ InputFilters.LETTERS_FILTER });
+        binding.etDni.setFilters(new InputFilter[]{ InputFilters.DIGITS_FILTER });
+        binding.etDni.setInputType(InputType.TYPE_CLASS_NUMBER);
+
         // aqui configuro el listener del boton para cambiar entre editar y guardar
         binding.btnEditarGuardar.setOnClickListener(v -> {
             // cuando se hace click, llamo al viewmodel con los datos actuales de los campos

@@ -16,13 +16,11 @@ import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 // aqui defino el viewmodel gestiona los datos del perfil y la logica de edicion
 public class PerfilViewModel extends AndroidViewModel {
     // aqui declaro los livedata para los campos del propietario y el estado de la vista
-    private MutableLiveData<Propietario> propietario = new MutableLiveData<>();
+    private final MutableLiveData<Propietario> propietario = new MutableLiveData<>();
     private final MutableLiveData<String> nombre = new MutableLiveData<>("");
     private final MutableLiveData<String> apellido = new MutableLiveData<>("");
     private final MutableLiveData<String> dni = new MutableLiveData<>("");
@@ -32,13 +30,22 @@ public class PerfilViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> mostrarToast = new MutableLiveData<>(false);
     private final MutableLiveData<String> mensajeToast = new MutableLiveData<>("");
 
-    private ApiService.ServiceInterface apiService;
+    // LiveData para errores de validación por campo
+    private final MutableLiveData<String> errorNombre = new MutableLiveData<>(null);
+    private final MutableLiveData<String> errorApellido = new MutableLiveData<>(null);
+    private final MutableLiveData<String> errorDni = new MutableLiveData<>(null);
+    // livedata para errores ya procesados (string vacio si no hay error)
+    private final MutableLiveData<String> errorNombreFinal = new MutableLiveData<>("");
+    private final MutableLiveData<String> errorApellidoFinal = new MutableLiveData<>("");
+    private final MutableLiveData<String> errorDniFinal = new MutableLiveData<>("");
+    // livedata para toast ya procesado (string vacio si no hay toast)
+    private final MutableLiveData<String> toastFinal = new MutableLiveData<>("");
+
+    private final ApiService.ServiceInterface apiService;
 
     // inicializo el viewmodel
     public PerfilViewModel(@NonNull Application application) {
         super(application);
-        // uso apiservice.getapiservice() para centralizar la instancia de retrofit y su interface. no creo la instancia manualmente aqui.
-        SharedPreferences prefs = application.getSharedPreferences("token_prefs", Context.MODE_PRIVATE);
         // Uso el cliente por defecto centralizado en ApiService
         OkHttpClient client = ApiService.getDefaultClient();
         apiService = ApiService.getApiService(client);
@@ -55,11 +62,24 @@ public class PerfilViewModel extends AndroidViewModel {
     public LiveData<Boolean> getMostrarToast() { return mostrarToast; }
     public LiveData<String> getMensajeToast() { return mensajeToast; }
 
+    // getters para errores
+    public LiveData<String> getErrorNombre() { return errorNombre; }
+    public LiveData<String> getErrorApellido() { return errorApellido; }
+    public LiveData<String> getErrorDni() { return errorDni; }
+    public LiveData<String> getErrorNombreFinal() { return errorNombreFinal; }
+    public LiveData<String> getErrorApellidoFinal() { return errorApellidoFinal; }
+    public LiveData<String> getErrorDniFinal() { return errorDniFinal; }
+    public LiveData<String> getToastFinal() { return toastFinal; }
+
     // cambio el modo edicion econ booleano
     public void toggleModoEdicion() {
         Boolean actual = modoEdicion.getValue();
         if (actual == null) actual = false;
         modoEdicion.setValue(!actual);
+        if (!modoEdicion.getValue()) {
+            // si salimos del modo edición, limpiar errores
+            clearErrors();
+        }
     }
 
     // inicio la carga de los datos del perfil desde la api
@@ -90,6 +110,12 @@ public class PerfilViewModel extends AndroidViewModel {
     // guardo los datos editados del perfil si el modo edicion esta activo
     public void guardarPerfil() {
         if (modoEdicion.getValue() != null && modoEdicion.getValue()) {
+            // validar antes de enviar
+            if (!validateAll()) {
+                // validation failed; mensaje ya seteado en validateAll()
+                return;
+            }
+
             SharedPreferences sp = getApplication().getSharedPreferences("token_prefs", Context.MODE_PRIVATE);
             String token = sp.getString("token", "");
             Propietario p = new Propietario();
@@ -120,11 +146,18 @@ public class PerfilViewModel extends AndroidViewModel {
                         modoEdicion.postValue(false);
                         mostrarToast.postValue(true);
                         mensajeToast.postValue("Perfil actualizado con éxito");
+                        clearErrors();
+                    } else {
+                        // respuesta no exitosa: mostrar mensaje genérico
+                        mostrarToast.postValue(true);
+                        mensajeToast.postValue("Error al actualizar el perfil");
                     }
                 }
                 @Override
                 public void onFailure(Call<Propietario> call, Throwable t) {
                     t.printStackTrace();
+                    mostrarToast.postValue(true);
+                    mensajeToast.postValue("Falla en la conexión: " + t.getMessage());
                 }
             });
         }
@@ -136,7 +169,115 @@ public class PerfilViewModel extends AndroidViewModel {
     public void setDni(String value) { dni.setValue(value); }
     public void setTelefono(String value) { telefono.setValue(value); }
     public void setEmail(String value) { email.setValue(value); }
-    public void toastMostrado() { mostrarToast.setValue(false); }
+    public void toastMostrado() {
+        mostrarToast.setValue(false);
+        toastFinal.setValue("");
+    }
+
+    // metodos para errores
+    private void clearErrors() {
+        errorNombre.postValue(null);
+        errorApellido.postValue(null);
+        errorDni.postValue(null);
+        errorNombreFinal.postValue("");
+        errorApellidoFinal.postValue("");
+        errorDniFinal.postValue("");
+    }
+
+    private boolean isValidNamePattern(String s) {
+        if (s == null) return false;
+        String trimmed = s.trim();
+        if (trimmed.isEmpty()) return false;
+        // permite letras (incluye acentos y ñ) y espacios
+        return trimmed.matches("^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+$");
+    }
+
+    private boolean isNumeric(String s) {
+        if (s == null) return false;
+        String trimmed = s.trim();
+        return !trimmed.isEmpty() && trimmed.matches("^\\d+$");
+    }
+
+    // valida todos los campos y setea los LiveData de error; retorna true si todo OK
+    private boolean validateAll() {
+        clearErrors();
+        boolean ok = true;
+
+        String n = nombre.getValue() != null ? nombre.getValue().trim() : "";
+        String a = apellido.getValue() != null ? apellido.getValue().trim() : "";
+        String d = dni.getValue() != null ? dni.getValue().trim() : "";
+
+        if (n.isEmpty()) {
+            errorNombre.postValue("El nombre es requerido");
+            errorNombreFinal.postValue("El nombre es requerido");
+            if (ok) {
+                mensajeToast.postValue("El nombre es requerido");
+                mostrarToast.postValue(true);
+                toastFinal.postValue("El nombre es requerido");
+            }
+            ok = false;
+        } else if (!isValidNamePattern(n)) {
+            errorNombre.postValue("El nombre sólo puede contener letras y espacios");
+            errorNombreFinal.postValue("El nombre sólo puede contener letras y espacios");
+            if (ok) {
+                mensajeToast.postValue("El nombre sólo puede contener letras y espacios");
+                mostrarToast.postValue(true);
+                toastFinal.postValue("El nombre sólo puede contener letras y espacios");
+            }
+            ok = false;
+        } else {
+            errorNombreFinal.postValue("");
+        }
+
+        if (a.isEmpty()) {
+            errorApellido.postValue("El apellido es requerido");
+            errorApellidoFinal.postValue("El apellido es requerido");
+            if (ok) {
+                mensajeToast.postValue("El apellido es requerido");
+                mostrarToast.postValue(true);
+                toastFinal.postValue("El apellido es requerido");
+            }
+            ok = false;
+        } else if (!isValidNamePattern(a)) {
+            errorApellido.postValue("El apellido sólo puede contener letras y espacios");
+            errorApellidoFinal.postValue("El apellido sólo puede contener letras y espacios");
+            if (ok) {
+                mensajeToast.postValue("El apellido sólo puede contener letras y espacios");
+                mostrarToast.postValue(true);
+                toastFinal.postValue("El apellido sólo puede contener letras y espacios");
+            }
+            ok = false;
+        } else {
+            errorApellidoFinal.postValue("");
+        }
+
+        if (d.isEmpty()) {
+            errorDni.postValue("El DNI es requerido");
+            errorDniFinal.postValue("El DNI es requerido");
+            if (ok) {
+                mensajeToast.postValue("El DNI es requerido");
+                mostrarToast.postValue(true);
+                toastFinal.postValue("El DNI es requerido");
+            }
+            ok = false;
+        } else if (!isNumeric(d)) {
+            errorDni.postValue("El DNI sólo puede contener números");
+            errorDniFinal.postValue("El DNI sólo puede contener números");
+            if (ok) {
+                mensajeToast.postValue("El DNI sólo puede contener números");
+                mostrarToast.postValue(true);
+                toastFinal.postValue("El DNI sólo puede contener números");
+            }
+            ok = false;
+        } else {
+            errorDniFinal.postValue("");
+        }
+
+        if (ok) {
+            toastFinal.postValue("");
+        }
+        return ok;
+    }
 
     // gestiono la logica del boton editar/guardar segun el modo edicion
     public void onBotonEditarGuardar(String nombre, String apellido, String dni, String telefono) {
