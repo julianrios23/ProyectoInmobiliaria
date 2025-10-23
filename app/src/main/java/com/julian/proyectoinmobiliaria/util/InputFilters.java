@@ -1,4 +1,4 @@
-package com.julian.proyectoinmobiliaria.draweractivity.ui.perfil;
+package com.julian.proyectoinmobiliaria.util;
 
 // yo creo filtros para inputs: letras y digitos
 
@@ -38,5 +38,25 @@ public class InputFilters {
             return null; // acepto el input
         }
     };
-}
 
+    // filtro que permite numeros decimales (punto o coma, solo uno, no al principio, no dos seguidos)
+    public static final InputFilter DECIMAL_FILTER = new InputFilter() {
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+            if (source == null) return null;
+            StringBuilder builder = new StringBuilder(dest);
+            builder.replace(dstart, dend, source.subSequence(start, end).toString());
+            String result = builder.toString();
+            // Permite solo digitos, un punto o una coma, no al principio, no dos puntos/comas seguidos, max 1 separador
+            if (result.matches("^\\d+(\\.|,)?\\d*$")) {
+                // Solo un punto o coma permitido
+                int dots = result.length() - result.replace(".", "").length();
+                int commas = result.length() - result.replace(",", "").length();
+                if (dots <= 1 && commas <= 1 && (dots + commas) <= 1) {
+                    return null;
+                }
+            }
+            return "";
+        }
+    };
+}

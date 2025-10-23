@@ -86,23 +86,40 @@ public class PerfilViewModel extends AndroidViewModel {
     public void cargarPerfil() {
         SharedPreferences sp = getApplication().getSharedPreferences("token_prefs", Context.MODE_PRIVATE);
         String token = sp.getString("token", "");
+        if (token == null || token.trim().isEmpty()) {
+            // Token inválido, mostrar error y evitar llamada a la API
+            mensajeToast.postValue("Token de sesión inválido. Por favor, vuelva a iniciar sesión.");
+            mostrarToast.postValue(true);
+            toastFinal.postValue("Token de sesión inválido. Por favor, vuelva a iniciar sesión.");
+            return;
+        }
         Call<Propietario> call = apiService.getPropietarios("Bearer " + token);
         call.enqueue(new Callback<Propietario>() {
             @Override
             public void onResponse(Call<Propietario> call, Response<Propietario> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     Propietario p = response.body();
+                    // Validar campos nulos antes de asignar
                     propietario.postValue(p);
-                    nombre.postValue(p.getNombre());
-                    apellido.postValue(p.getApellido());
-                    dni.postValue(p.getDni());
-                    telefono.postValue(p.getTelefono());
-                    email.postValue(p.getEmail());
+                    nombre.postValue(p.getNombre() != null ? p.getNombre() : "");
+                    apellido.postValue(p.getApellido() != null ? p.getApellido() : "");
+                    dni.postValue(p.getDni() != null ? p.getDni() : "");
+                    telefono.postValue(p.getTelefono() != null ? p.getTelefono() : "");
+                    email.postValue(p.getEmail() != null ? p.getEmail() : "");
+                } else {
+                    // Respuesta no exitosa o sin datos
+                    mensajeToast.postValue("No se pudo cargar el perfil. Intente nuevamente.");
+                    mostrarToast.postValue(true);
+                    toastFinal.postValue("No se pudo cargar el perfil. Intente nuevamente.");
                 }
             }
             @Override
             public void onFailure(Call<Propietario> call, Throwable t) {
+                // Registrar el error y mostrar mensaje al usuario
                 t.printStackTrace();
+                mensajeToast.postValue("Error de conexión al cargar el perfil: " + t.getMessage());
+                mostrarToast.postValue(true);
+                toastFinal.postValue("Error de conexión al cargar el perfil: " + t.getMessage());
             }
         });
     }
@@ -170,8 +187,9 @@ public class PerfilViewModel extends AndroidViewModel {
     public void setTelefono(String value) { telefono.setValue(value); }
     public void setEmail(String value) { email.setValue(value); }
     public void toastMostrado() {
-        mostrarToast.setValue(false);
-        toastFinal.setValue("");
+        if (toastFinal.getValue() != null && !toastFinal.getValue().isEmpty()) {
+            toastFinal.setValue("");
+        }
     }
 
     // metodos para errores
@@ -289,6 +307,21 @@ public class PerfilViewModel extends AndroidViewModel {
             guardarPerfil();
         } else {
             toggleModoEdicion();
+        }
+    }
+
+    // Maneja el click del botón editar/guardar desde el Fragment
+    public void onClickEditarGuardar(boolean modoEdicionActual, String nombreNuevo, String apellidoNuevo, String dniNuevo, String telefonoNuevo) {
+        if (modoEdicionActual) {
+            // Si está en modo edición, setea los valores y guarda (con validación)
+            setNombre(nombreNuevo);
+            setApellido(apellidoNuevo);
+            setDni(dniNuevo);
+            setTelefono(telefonoNuevo);
+            guardarPerfil();
+        } else {
+            // Si está en modo solo lectura, cambia a modo edición
+            modoEdicion.setValue(true);
         }
     }
 }

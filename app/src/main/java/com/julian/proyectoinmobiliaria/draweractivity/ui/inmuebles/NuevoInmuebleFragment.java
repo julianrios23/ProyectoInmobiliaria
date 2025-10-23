@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import android.widget.Toast;
 
 import com.julian.proyectoinmobiliaria.R;
 import com.julian.proyectoinmobiliaria.databinding.FragmentNuevoInmuebleBinding; // importo la clase de binding que android genero para mi layout
+import com.julian.proyectoinmobiliaria.util.InputFilters;
 
 // defino mi clase NuevoInmuebleFragment que extiende de DialogFragment
 public class NuevoInmuebleFragment extends DialogFragment {
@@ -57,60 +59,54 @@ public class NuevoInmuebleFragment extends DialogFragment {
         binding = FragmentNuevoInmuebleBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
 
+        // Aplico los filtros de input a los campos correspondientes
+        binding.etDireccion.setFilters(new InputFilter[]{InputFilters.LETTERS_FILTER});
+        binding.etUso.setFilters(new InputFilter[]{InputFilters.LETTERS_FILTER});
+        binding.etTipo.setFilters(new InputFilter[]{InputFilters.LETTERS_FILTER});
+        binding.etAmbientes.setFilters(new InputFilter[]{InputFilters.DIGITS_FILTER});
+        binding.etSuperficie.setFilters(new InputFilter[]{InputFilters.DECIMAL_FILTER});
+        binding.etLatitud.setFilters(new InputFilter[]{InputFilters.DECIMAL_FILTER});
+        binding.etLongitud.setFilters(new InputFilter[]{InputFilters.DECIMAL_FILTER});
+        binding.etValor.setFilters(new InputFilter[]{InputFilters.DECIMAL_FILTER});
+
         // cuando el usuario toca el boton de seleccionar imagen, abro el selector de imagenes
         binding.btnSeleccionarImagen.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startActivityForResult(intent, PICK_IMAGE_REQUEST);
         });
 
-        // cuando el usuario toca el boton de guardar, voy recogiendo los datos y los paso al viewmodel
+        // cuando el usuario toca el boton de guardar, solo paso los datos al ViewModel y no hago validación aquí
         binding.btnGuardar.setOnClickListener(v -> {
-            // recojo los datos de los campos de la interfaz usando el binding
-            String direccion = binding.etDireccion.getText().toString();
-            String uso = binding.etUso.getText().toString();
-            String tipo = binding.etTipo.getText().toString();
-            String ambientes = binding.etAmbientes.getText().toString();
-            String superficie = binding.etSuperficie.getText().toString();
-            String latitud = binding.etLatitud.getText().toString();
-            String longitud = binding.etLongitud.getText().toString();
-            String valor = binding.etValor.getText().toString();
-            boolean disponible = binding.cbDisponible.isChecked();
-            boolean contratoVigente = binding.cbContrato.isChecked();
-
-            // muestro un dialogo de confirmacion antes de guardar
-            new AlertDialog.Builder(getContext())
-                    .setTitle("confirmar guardado")
-                    .setMessage("¿esta seguro de querer guardar este nuevo inmueble?")
-                    .setPositiveButton("si", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // si el usuario confirma, llamo al viewmodel para procesar el nuevo inmueble
-                            mViewModel.procesarNuevoInmueble(
-                                direccion, uso, tipo, ambientes, superficie, latitud, longitud, valor,
-                                disponible, contratoVigente, imagenUri, getContext(),
-                                () -> mInmueblesViewModel.cargarInmuebles() // recargo la lista solo despues de un exito
-                            );
-                        }
-                    })
-                    .setNegativeButton("no", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // si el usuario cancela, simplemente cierro el dialogo
-                            dialog.dismiss();
-                        }
-                    })
-                    .show();
+            mViewModel.validarYProcesarNuevoInmueble(
+                binding.etDireccion.getText().toString().trim(),
+                binding.etUso.getText().toString().trim(),
+                binding.etTipo.getText().toString().trim(),
+                binding.etAmbientes.getText().toString().trim(),
+                binding.etSuperficie.getText().toString().trim(),
+                binding.etLatitud.getText().toString().trim(),
+                binding.etLongitud.getText().toString().trim(),
+                binding.etValor.getText().toString().trim(),
+                binding.cbDisponible.isChecked(),
+                binding.cbContrato.isChecked(),
+                imagenUri,
+                getContext(),
+                () -> mInmueblesViewModel.cargarInmuebles()
+            );
         });
-        
-        // observo el resultado del viewmodel y muestro un mensaje segun corresponda
-        mViewModel.getResultadoLiveData().observe(getViewLifecycleOwner(), result -> {
-            Toast.makeText(getContext(), result.mensaje, Toast.LENGTH_LONG).show();
-            if (result.exito) {
-                // si el guardado fue exitoso, recargo la lista y cierro el dialogfragment
-                // la recarga ya se hace en el callback del viewmodel, asi que solo cierro el dialog
-                dismiss();
 
-            }
+        // Observar errores de validación y mostrarlos en los EditText
+        mViewModel.errorDireccion.observe(getViewLifecycleOwner(), error -> binding.etDireccion.setError(error));
+        mViewModel.errorUso.observe(getViewLifecycleOwner(), error -> binding.etUso.setError(error));
+        mViewModel.errorTipo.observe(getViewLifecycleOwner(), error -> binding.etTipo.setError(error));
+        mViewModel.errorAmbientes.observe(getViewLifecycleOwner(), error -> binding.etAmbientes.setError(error));
+        mViewModel.errorSuperficie.observe(getViewLifecycleOwner(), error -> binding.etSuperficie.setError(error));
+        mViewModel.errorLatitud.observe(getViewLifecycleOwner(), error -> binding.etLatitud.setError(error));
+        mViewModel.errorLongitud.observe(getViewLifecycleOwner(), error -> binding.etLongitud.setError(error));
+        mViewModel.errorValor.observe(getViewLifecycleOwner(), error -> binding.etValor.setError(error));
+
+        // Observar el resultado general y mostrar Toast o cerrar el diálogo
+        mViewModel.getResultadoLiveData().observe(getViewLifecycleOwner(), result -> {
+            mViewModel.manejarResultado(requireContext(), result, this);
         });
         
         // si toco el boton de atras, cierro el dialogo

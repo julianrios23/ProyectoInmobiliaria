@@ -34,6 +34,16 @@ public class NuevoInmuebleViewModel extends AndroidViewModel {
     // livedata para el resultado de la operacion de alta
     private final MutableLiveData<ResultInmueble> resultadoLiveData = new MutableLiveData<>();
 
+    // LiveData para errores de validación por campo
+    public final MutableLiveData<String> errorDireccion = new MutableLiveData<>(null);
+    public final MutableLiveData<String> errorUso = new MutableLiveData<>(null);
+    public final MutableLiveData<String> errorTipo = new MutableLiveData<>(null);
+    public final MutableLiveData<String> errorAmbientes = new MutableLiveData<>(null);
+    public final MutableLiveData<String> errorSuperficie = new MutableLiveData<>(null);
+    public final MutableLiveData<String> errorLatitud = new MutableLiveData<>(null);
+    public final MutableLiveData<String> errorLongitud = new MutableLiveData<>(null);
+    public final MutableLiveData<String> errorValor = new MutableLiveData<>(null);
+
     // inicializo el viewmodel, configuro api y preferencias
     public NuevoInmuebleViewModel(@NonNull Application application) {
         super(application);
@@ -146,6 +156,17 @@ public class NuevoInmuebleViewModel extends AndroidViewModel {
         return resultadoLiveData;
     }
 
+    public void limpiarErrores() {
+        errorDireccion.postValue(null);
+        errorUso.postValue(null);
+        errorTipo.postValue(null);
+        errorAmbientes.postValue(null);
+        errorSuperficie.postValue(null);
+        errorLatitud.postValue(null);
+        errorLongitud.postValue(null);
+        errorValor.postValue(null);
+    }
+
     //logica para dar de alta un inmueble con la foto
     public void procesarNuevoInmueble(String direccion, String uso, String tipo,
                                       String ambientes, String superficie, String latitud, String longitud, String valor,
@@ -222,6 +243,63 @@ public class NuevoInmuebleViewModel extends AndroidViewModel {
             String tokenBearer = "Bearer " + token;
             Call<Inmueble> call = apiService.nuevoInmueble(tokenBearer, inmueble);
             call.enqueue(callback);
+        }
+    }
+
+    // Validación centralizada y procesamiento
+    public void validarYProcesarNuevoInmueble(String direccion, String uso, String tipo,
+                                              String ambientes, String superficie, String latitud, String longitud, String valor,
+                                              boolean disponible, boolean contratoVigente, android.net.Uri imagenUri, android.content.Context context, Runnable onSuccess) {
+        limpiarErrores();
+        boolean valido = true;
+        if (direccion.isEmpty() || !direccion.matches("[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+")) {
+            errorDireccion.postValue("Ingrese solo letras y espacios");
+            valido = false;
+        }
+        if (uso.isEmpty() || !uso.matches("[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+")) {
+            errorUso.postValue("Ingrese solo letras y espacios");
+            valido = false;
+        }
+        if (tipo.isEmpty() || !tipo.matches("[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+")) {
+            errorTipo.postValue("Ingrese solo letras y espacios");
+            valido = false;
+        }
+        if (ambientes.isEmpty() || !ambientes.matches("\\d+")) {
+            errorAmbientes.postValue("Ingrese un número entero");
+            valido = false;
+        }
+        if (superficie.isEmpty() || !superficie.matches("\\d+(\\.|,)?\\d*")) {
+            errorSuperficie.postValue("Ingrese un número válido");
+            valido = false;
+        }
+        if (latitud.isEmpty() || !latitud.matches("\\d+(\\.|,)?\\d*")) {
+            errorLatitud.postValue("Ingrese un número válido");
+            valido = false;
+        }
+        if (longitud.isEmpty() || !longitud.matches("\\d+(\\.|,)?\\d*")) {
+            errorLongitud.postValue("Ingrese un número válido");
+            valido = false;
+        }
+        if (valor.isEmpty() || !valor.matches("\\d+(\\.|,)?\\d*")) {
+            errorValor.postValue("Ingrese un número válido");
+            valido = false;
+        }
+        if (!valido) {
+            resultadoLiveData.postValue(ResultInmueble.error("Corrija los campos marcados antes de guardar"));
+            return;
+        }
+        // Si todo es válido, procesar
+        procesarNuevoInmueble(direccion, uso, tipo, ambientes, superficie, latitud, longitud, valor, disponible, contratoVigente, imagenUri, context, onSuccess);
+    }
+
+    // Maneja el resultado desde el ViewModel: muestra Toast y cierra el diálogo si corresponde
+    public void manejarResultado(android.content.Context context, ResultInmueble result, androidx.fragment.app.DialogFragment fragment) {
+        if (result == null) return;
+        if (Boolean.TRUE.equals(result.exito)) {
+            android.widget.Toast.makeText(context, result.mensaje, android.widget.Toast.LENGTH_LONG).show();
+            fragment.dismiss();
+        } else if (result.mensaje != null && !result.mensaje.isEmpty()) {
+            android.widget.Toast.makeText(context, result.mensaje, android.widget.Toast.LENGTH_LONG).show();
         }
     }
 

@@ -1,6 +1,6 @@
 package com.julian.proyectoinmobiliaria.draweractivity.ui.perfil;
 
-// yo implemento las validaciones y filtros en este fragment
+// implemento las validaciones y filtros en este fragment
 
 import androidx.lifecycle.ViewModelProvider;
 import android.os.Bundle;
@@ -9,8 +9,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 import com.julian.proyectoinmobiliaria.databinding.FragmentPerfilBinding; // importo la clase de binding que android genero para mi layout
+import com.julian.proyectoinmobiliaria.util.InputFilters;
+
 import android.text.InputFilter;
 import android.text.InputType;
 
@@ -41,33 +44,63 @@ public class PerfilFragment extends Fragment {
         mViewModel = new ViewModelProvider(this).get(PerfilViewModel.class); // inicializo mi viewmodel
         
         // observo el nombre del viewmodel y lo muestro en el edittext
-        mViewModel.getNombre().observe(getViewLifecycleOwner(), nombre -> binding.etNombre.setText(nombre));
+        mViewModel.getNombre().observe(getViewLifecycleOwner(), nombre -> {
+            binding.etNombre.setText(nombre);
+        });
         // observo el apellido del viewmodel y lo muestro en el edittext
-        mViewModel.getApellido().observe(getViewLifecycleOwner(), apellido -> binding.etApellido.setText(apellido));
+        mViewModel.getApellido().observe(getViewLifecycleOwner(), apellido -> {
+            binding.etApellido.setText(apellido);
+        });
         // observo el dni del viewmodel y lo muestro en el edittext
-        mViewModel.getDni().observe(getViewLifecycleOwner(), dni -> binding.etDni.setText(dni));
+        mViewModel.getDni().observe(getViewLifecycleOwner(), dni -> {
+            binding.etDni.setText(dni);
+        });
         // observo el telefono del viewmodel y lo muestro en el edittext
-        mViewModel.getTelefono().observe(getViewLifecycleOwner(), telefono -> binding.etTelefono.setText(telefono));
+        mViewModel.getTelefono().observe(getViewLifecycleOwner(), telefono -> {
+            binding.etTelefono.setText(telefono);
+        });
         // observo el email del viewmodel y lo muestro en el textview
-        mViewModel.getEmail().observe(getViewLifecycleOwner(), email -> binding.tvEmail.setText(email));
-        
+        mViewModel.getEmail().observe(getViewLifecycleOwner(), email -> {
+            binding.tvEmail.setText(email);
+        });
+
         // observo el modo edicion del viewmodel para habilitar/deshabilitar campos y cambiar el texto del boton
         mViewModel.getModoEdicion().observe(getViewLifecycleOwner(), modoEdicion -> {
             binding.etNombre.setEnabled(modoEdicion);
             binding.etApellido.setEnabled(modoEdicion);
             binding.etDni.setEnabled(modoEdicion);
             binding.etTelefono.setEnabled(modoEdicion);
-            binding.btnEditarGuardar.setText(modoEdicion ? "guardar" : "editar"); // cambio el texto del boton
+            binding.btnEditarGuardar.setText(modoEdicion ? "GUARDAR" : "EDITAR"); // cambio el texto del boton en mayúsculas
         });
 
         // observo los errores de validacion ya procesados y los muestro directamente
-        mViewModel.getErrorNombreFinal().observe(getViewLifecycleOwner(), error -> binding.etNombre.setError(error));
-        mViewModel.getErrorApellidoFinal().observe(getViewLifecycleOwner(), error -> binding.etApellido.setError(error));
-        mViewModel.getErrorDniFinal().observe(getViewLifecycleOwner(), error -> binding.etDni.setError(error));
+        mViewModel.getErrorNombreFinal().observe(getViewLifecycleOwner(), error -> {
+            if (error == null || error.trim().isEmpty()) {
+                binding.etNombre.setError(null);
+            } else {
+                binding.etNombre.setError(error);
+            }
+        });
+        mViewModel.getErrorApellidoFinal().observe(getViewLifecycleOwner(), error -> {
+            if (error == null || error.trim().isEmpty()) {
+                binding.etApellido.setError(null);
+            } else {
+                binding.etApellido.setError(error);
+            }
+        });
+        mViewModel.getErrorDniFinal().observe(getViewLifecycleOwner(), error -> {
+            if (error == null || error.trim().isEmpty()) {
+                binding.etDni.setError(null);
+            } else {
+                binding.etDni.setError(error);
+            }
+        });
         // observo el toast ya procesado y lo muestro directamente
         mViewModel.getToastFinal().observe(getViewLifecycleOwner(), mensaje -> {
-            Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
-            mViewModel.toastMostrado();
+            if (mensaje != null && !mensaje.trim().isEmpty()) {
+                Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
+                mViewModel.toastMostrado();
+            }
         });
 
         // aplico filtros de entrada para mejorar la experiencia (nombre/apellido solo letras, dni solo digitos)
@@ -78,11 +111,14 @@ public class PerfilFragment extends Fragment {
 
         // aqui configuro el listener del boton para cambiar entre editar y guardar
         binding.btnEditarGuardar.setOnClickListener(v -> {
-            // cuando se hace click, llamo al viewmodel con los datos actuales de los campos
-            mViewModel.onBotonEditarGuardar(binding.etNombre.getText().toString(),
-                                            binding.etApellido.getText().toString(),
-                                            binding.etDni.getText().toString(),
-                                            binding.etTelefono.getText().toString());
+            boolean modoEdicion = Boolean.TRUE.equals(mViewModel.getModoEdicion().getValue());
+            mViewModel.onClickEditarGuardar(
+                modoEdicion,
+                binding.etNombre.getText().toString().trim(),
+                binding.etApellido.getText().toString().trim(),
+                binding.etDni.getText().toString().trim(),
+                binding.etTelefono.getText().toString().trim()
+            );
         });
         
         // aqui cargo los datos iniciales del perfil desde el viewmodel

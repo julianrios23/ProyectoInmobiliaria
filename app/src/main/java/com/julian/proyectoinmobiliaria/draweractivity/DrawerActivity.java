@@ -78,29 +78,6 @@ public class DrawerActivity extends AppCompatActivity {
         binding.appBarDrawer.toolbar.setNavigationIcon(R.drawable.menu);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        navigationView.setNavigationItemSelectedListener(item -> {
-            int id = item.getItemId();
-            android.util.Log.d("OUT", "Menu seleccionado: " + id);
-            if (id == R.id.nav_logout) {
-                android.util.Log.d("OUT", "Logout seleccionado");
-                // Navegar manualmente al fragment de logout
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.nav_host_fragment_content_drawer, new com.julian.proyectoinmobiliaria.draweractivity.ui.logout.LogoutFragment())
-                        .addToBackStack(null)
-                        .commit();
-                DrawerLayout drawer1 = binding.drawerLayout;
-                drawer1.closeDrawers();
-                return true;
-            }
-            // Dejar que NavigationUI maneje el resto
-            NavController navController1 = Navigation.findNavController(this, R.id.nav_host_fragment_content_drawer);
-            boolean handled = NavigationUI.onNavDestinationSelected(item, navController1);
-            if (handled) {
-                DrawerLayout drawer1 = binding.drawerLayout;
-                drawer1.closeDrawers();
-            }
-            return handled;
-        });
         // inicializo el viewmodel para delegar toda la logica
         DrawerActivityViewModel viewModel = new ViewModelProvider(this).get(DrawerActivityViewModel.class);
         // observo si debo mostrar el nombre y apellido

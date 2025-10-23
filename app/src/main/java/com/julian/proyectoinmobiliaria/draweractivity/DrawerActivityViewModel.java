@@ -72,6 +72,15 @@ public class DrawerActivityViewModel extends AndroidViewModel {
 
     // este metodo maneja la navegacion del menu
     public void manejarMenu(android.view.MenuItem item, androidx.fragment.app.FragmentActivity activity, androidx.drawerlayout.widget.DrawerLayout drawerLayout) {
+        // Desmarcar todos los ítems antes de marcar el nuevo
+        com.google.android.material.navigation.NavigationView navigationView = activity.findViewById(com.julian.proyectoinmobiliaria.R.id.nav_view);
+        if (navigationView != null) {
+            android.view.Menu menu = navigationView.getMenu();
+            for (int i = 0; i < menu.size(); i++) {
+                menu.getItem(i).setChecked(false);
+            }
+        }
+        item.setChecked(true);
         int id = item.getItemId();
         if (id == com.julian.proyectoinmobiliaria.R.id.nav_logout) {
             activity.getSupportFragmentManager().beginTransaction()
