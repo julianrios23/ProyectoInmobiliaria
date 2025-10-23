@@ -60,7 +60,7 @@ public class NuevoInmuebleFragment extends DialogFragment {
         View view = binding.getRoot();
 
         // Aplico los filtros de input a los campos correspondientes
-        binding.etDireccion.setFilters(new InputFilter[]{InputFilters.LETTERS_FILTER});
+        binding.etDireccion.setFilters(new InputFilter[]{InputFilters.LETTERS_DIGITS_FILTER});
         binding.etUso.setFilters(new InputFilter[]{InputFilters.LETTERS_FILTER});
         binding.etTipo.setFilters(new InputFilter[]{InputFilters.LETTERS_FILTER});
         binding.etAmbientes.setFilters(new InputFilter[]{InputFilters.DIGITS_FILTER});

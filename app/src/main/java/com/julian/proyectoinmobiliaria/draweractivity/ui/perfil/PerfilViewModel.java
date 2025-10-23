@@ -161,8 +161,9 @@ public class PerfilViewModel extends AndroidViewModel {
                         telefono.postValue(actualizado.getTelefono());
                         email.postValue(actualizado.getEmail());
                         modoEdicion.postValue(false);
-                        mostrarToast.postValue(true);
-                        mensajeToast.postValue("Perfil actualizado con éxito");
+                        mostrarToast.postValue(true); // Mostrar el toast
+                        mensajeToast.postValue("Perfil actualizado con éxito"); // Mensaje del toast
+                        toastFinal.postValue("Perfil actualizado con éxito"); // Asegura que el toast se muestre
                         clearErrors();
                     } else {
                         // respuesta no exitosa: mostrar mensaje genérico

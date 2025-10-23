@@ -59,4 +59,21 @@ public class InputFilters {
             return "";
         }
     };
+
+    // filtro que permite letras, números, espacios y acentos (incluye ñ)
+    public static final InputFilter LETTERS_DIGITS_FILTER = new InputFilter() {
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+            if (source == null) return null;
+            for (int i = start; i < end; i++) {
+                char c = source.charAt(i);
+                String s = String.valueOf(c);
+                // permito letras, números, acentos, ñ y espacio
+                if (!s.matches("[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 ]")) {
+                    return ""; // bloqueo el caracter
+                }
+            }
+            return null; // acepto el input
+        }
+    };
 }

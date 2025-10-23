@@ -37,20 +37,14 @@ public class DrawerActivityViewModel extends AndroidViewModel {
         return email;
     }
 
-    // este metodo verifica si el usuario esta logueado y si debe mostrar el fragmento de logout
-    // Ahora recibe la instancia de FragmentActivity como parámetro
+    // este metodo verifica si debe mostrar el fragmento de logout al presionar atrás
     public void manejarBackPressed(androidx.fragment.app.FragmentActivity activity) {
-        android.content.SharedPreferences prefs = getApplication().getSharedPreferences("datos", android.content.Context.MODE_PRIVATE);
-        boolean logueado = prefs.getBoolean("logueado", false);
         if (activity != null) {
             androidx.fragment.app.Fragment currentFragment = activity.getSupportFragmentManager().findFragmentById(com.julian.proyectoinmobiliaria.R.id.nav_host_fragment_content_drawer);
-            if (logueado) {
-                if (!(currentFragment instanceof com.julian.proyectoinmobiliaria.draweractivity.ui.logout.LogoutFragment)) {
-                    mostrarLogout.setValue(true);
-                }
-            } else {
-                cerrarApp.setValue(true);
+            if (!(currentFragment instanceof com.julian.proyectoinmobiliaria.draweractivity.ui.logout.LogoutFragment)) {
+                mostrarLogout.setValue(true);
             }
+            // Nunca cerrar la app ni minimizar
         }
     }
 

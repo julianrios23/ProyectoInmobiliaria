@@ -35,14 +35,14 @@
 
     <TextView
         android:id="@+id/textView3"
-        android:layout_width="129dp"
+        android:layout_width="wrap_content"
         android:layout_height="41dp"
         android:layout_marginTop="356dp"
         android:fontFamily="sans-serif-black"
-        android:text="Login"
+        android:text="Bienvenido"
         android:textAlignment="center"
         android:textColor="@color/olive"
-        android:textSize="24sp"
+        android:textSize="26sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"

@@ -252,8 +252,8 @@ public class NuevoInmuebleViewModel extends AndroidViewModel {
                                               boolean disponible, boolean contratoVigente, android.net.Uri imagenUri, android.content.Context context, Runnable onSuccess) {
         limpiarErrores();
         boolean valido = true;
-        if (direccion.isEmpty() || !direccion.matches("[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+")) {
-            errorDireccion.postValue("Ingrese solo letras y espacios");
+        if (direccion.isEmpty() || !direccion.matches("[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 ]+")) {
+            errorDireccion.postValue("Ingrese solo letras, números y espacios");
             valido = false;
         }
         if (uso.isEmpty() || !uso.matches("[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+")) {
