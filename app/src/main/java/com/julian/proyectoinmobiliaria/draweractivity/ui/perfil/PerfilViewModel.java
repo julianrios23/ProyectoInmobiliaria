@@ -184,7 +184,14 @@ public class PerfilViewModel extends AndroidViewModel {
     // defino los metodos para actualizar los livedata desde el fragmento
     public void setNombre(String value) { nombre.setValue(value); }
     public void setApellido(String value) { apellido.setValue(value); }
-    public void setDni(String value) { dni.setValue(value); }
+    public void setDni(String value) {
+        if (value != null && value.matches("\\d+")) {
+            dni.setValue(value);
+            errorDniFinal.setValue(""); // Sin error
+        } else {
+            errorDniFinal.setValue("El DNI solo debe contener números");
+        }
+    }
     public void setTelefono(String value) { telefono.setValue(value); }
     public void setEmail(String value) { email.setValue(value); }
     public void toastMostrado() {

@@ -108,6 +108,8 @@ public class PerfilFragment extends Fragment {
         binding.etApellido.setFilters(new InputFilter[]{ InputFilters.LETTERS_FILTER });
         binding.etDni.setFilters(new InputFilter[]{ InputFilters.DIGITS_FILTER });
         binding.etDni.setInputType(InputType.TYPE_CLASS_NUMBER);
+        binding.etTelefono.setFilters(new InputFilter[]{ InputFilters.DIGITS_FILTER });
+        binding.etTelefono.setInputType(InputType.TYPE_CLASS_NUMBER);
 
         // aqui configuro el listener del boton para cambiar entre editar y guardar
         binding.btnEditarGuardar.setOnClickListener(v -> {
