@@ -61,8 +61,8 @@ public class ContratoVigenteAdapter extends RecyclerView.Adapter<ContratoVigente
 
             holder.tvContratoVigente.setText("Contrato Vigente: " + (contrato.estado ? "Sí" : "No"));
             // muestro fechas y monto
-            holder.tvFechaInicio.setText("Inicio: " + contrato.fechaInicio);
-            holder.tvFechaFin.setText("Fin: " + contrato.fechaFinalizacion);
+            holder.tvFechaInicio.setText("Inicio: " + formatFecha(contrato.fechaInicio));
+            holder.tvFechaFin.setText("Fin: " + formatFecha(contrato.fechaFinalizacion));
             // aqui muestro el nombre y apellido del inquilino usando los campos publicos
             holder.tvInquilino.setText("Inquilino: " + contrato.inquilino.nombre + " " + contrato.inquilino.apellido);
             // aqui uso el metodo loadImage para mostrar la imagen del inmueble
@@ -75,6 +75,18 @@ public class ContratoVigenteAdapter extends RecyclerView.Adapter<ContratoVigente
             });
         } catch (Exception e) {
             Log.e("ContratoVigenteAdapter", "Error al mostrar contrato: " + e.getMessage());
+        }
+    }
+
+    // Formatea la fecha a dd/MM/yyyy
+    private String formatFecha(String fecha) {
+        try {
+            java.text.SimpleDateFormat formatoEntrada = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault());
+            java.text.SimpleDateFormat formatoSalida = new java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault());
+            java.util.Date date = formatoEntrada.parse(fecha);
+            return formatoSalida.format(date);
+        } catch (Exception e) {
+            return fecha;
         }
     }
 
